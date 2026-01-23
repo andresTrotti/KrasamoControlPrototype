@@ -1,28 +1,57 @@
+//
+//  MatterDeviceRepositoryImpl.swift
+//  ControlPrototype
+//
+//  Created by Andres Trotti on 1/23/26.
+//
+
+import Matter
+
+
 // Data
 
 final class MatterDeviceRepositoryImpl: MatterDeviceRepository {
     private let controller: MTRDeviceController // o el tipo actual del SDK
 
+    
     init(controller: MTRDeviceController) {
         self.controller = controller
     }
 
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
-        // 1. Parsear QR → setup payload
-        // 2. Llamar a controller para commissioning
-        // 3. Esperar resultado y mapear a MatterDevice
+        // Nuevo inicializador recomendado por Apple
+        var parseError: NSError?
+        guard let setupPayload = MTRSetupPayload(payload: qrString) else {
+            throw parseError ?? NSError(
+                domain: "Matter",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "No se pudo parsear el código Matter"]
+            )
+        }
 
-        // Pseudocódigo:
-        /*
-        let params = MTRCommissioningParameters()
-        params.setupPayload = qrString
-        let nodeID = try await controller.commissionDevice(with: params)
-        return MatterDevice(id: MatterDeviceID(rawValue: nodeID),
-                            name: "x917",
-                            isOnline: true)
-        */
-        throw NSError(domain: "NotImplemented", code: -1)
+        let commissioningParams = MTRCommissioningParameters()
+        commissioningParams.setupPayload = setupPayload
+
+        let nodeID = try await withCheckedThrowingContinuation { continuation in
+            controller.commissionDevice(
+                with: commissioningParams,
+                commissioningComplete: { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume(returning: commissioningParams.deviceID)
+                    }
+                }
+            )
+        }
+
+        return MatterDevice(
+            deviceID: MatterDeviceID(rawValue: nodeID),
+            name: "x917",
+            isOnline: true
+        )
     }
+
 
     func getKnownDevices() async throws -> [MatterDevice] {
         // Leer de storage local + validar con controller si siguen online

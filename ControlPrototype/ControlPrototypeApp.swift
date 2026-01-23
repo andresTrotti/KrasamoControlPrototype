@@ -11,7 +11,7 @@ import SwiftUI
 struct ControlPrototypeApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRouter(container: container)
         }
     }
 }

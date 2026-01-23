@@ -11,7 +11,4 @@ enum HeaterState {
     case heating
 }
 
-enum CoolerState {
-    case off
-    case cooling
-}
+
