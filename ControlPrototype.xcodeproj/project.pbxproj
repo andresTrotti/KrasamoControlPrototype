@@ -29,9 +29,22 @@
 		A1DFBBEA2F23AC6E0032C3AD /* ControlPrototypeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ControlPrototypeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A12D6A772F241FCE006B4201 /* Exceptions for "ControlPrototype" folder in "ControlPrototype" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A1DFBBD22F23AC6D0032C3AD /* ControlPrototype */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A1DFBBD52F23AC6D0032C3AD /* ControlPrototype */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A12D6A772F241FCE006B4201 /* Exceptions for "ControlPrototype" folder in "ControlPrototype" target */,
+			);
 			path = ControlPrototype;
 			sourceTree = "<group>";
 		};
@@ -395,11 +408,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ControlPrototype/ControlPrototype.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9PM7XZB7XD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ControlPrototype/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Let use bluetooth";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Let find devices arround";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Let use the camera";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Let find netword devices";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -423,11 +442,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ControlPrototype/ControlPrototype.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9PM7XZB7XD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ControlPrototype/Info.plist;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Let use bluetooth";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "Let find devices arround";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Let use the camera";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Let find netword devices";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

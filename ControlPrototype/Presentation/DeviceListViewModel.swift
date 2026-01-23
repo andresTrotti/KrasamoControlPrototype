@@ -1,3 +1,11 @@
+//
+//  DeviceListViewModel.swift
+//  ControlPrototype
+//
+//  Created by Andres Trotti on 1/23/26.
+//
+
+
 import Foundation
 
 @MainActor
@@ -7,6 +15,8 @@ final class DeviceListViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let getKnownDevicesUseCase: GetKnownDevicesUseCase
+    
+    
 
     init(getKnownDevicesUseCase: GetKnownDevicesUseCase) {
         self.getKnownDevicesUseCase = getKnownDevicesUseCase

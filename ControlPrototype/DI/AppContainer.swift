@@ -6,57 +6,42 @@
 //
 
 import Foundation
+import Matter
 
+@MainActor
 final class AppContainer: ObservableObject {
-    // Repos
-    let matterRepository: MatterDeviceRepository
+    // 1. Dependencias de bajo nivel (SDK de Matter)
+    private let matterController: MTRDeviceController
 
-    // Use cases
-    let commissionDeviceUseCase: CommissionDeviceUseCase
-    let getKnownDevicesUseCase: GetKnownDevicesUseCase
-    let toggleLedUseCase: ToggleLedUseCase
-    let readTemperatureUseCase: ReadTemperatureUseCase
-    let readHeaterStateUseCase: ReadHeaterStateUseCase
-    let readCoolerStateUseCase: ReadCoolerStateUseCase
+    // 2. Repositorios
+    private let deviceRepository: MatterDeviceRepository
 
     init() {
-        // Infrastructure
-        let controller = MatterControllerFactory.makeController()
-
-        // Data
-        let matterRepo = MatterDeviceRepositoryImpl(controller: controller)
-
-        self.matterRepository = matterRepo
-
-        // Domain (use cases)
-        self.commissionDeviceUseCase = CommissionDeviceUseCase(repository: matterRepo)
-        self.getKnownDevicesUseCase = GetKnownDevicesUseCase(repository: matterRepo)
-        self.toggleLedUseCase = ToggleLedUseCase(repository: matterRepo)
-        self.readTemperatureUseCase = ReadTemperatureUseCase(repository: matterRepo)
-        self.readHeaterStateUseCase = ReadHeaterStateUseCase(repository: matterRepo)
-        self.readCoolerStateUseCase = ReadCoolerStateUseCase(repository: matterRepo)
+        // Inicializamos el controlador usando tu factory
+        self.matterController = MatterControllerFactory.makeController()
+        
+        // Inicializamos el repositorio real
+        self.deviceRepository = MatterDeviceRepositoryImpl(controller: matterController)
     }
 
-    // Factories de ViewModels
+    // --- Creadores de ViewModels (Para el Router) ---
+
     func makeDeviceListViewModel() -> DeviceListViewModel {
-        DeviceListViewModel(
-            getKnownDevicesUseCase: getKnownDevicesUseCase
-        )
+        // Aquí es donde nace el 'getKnownDevicesUseCase'
+        let useCase = GetKnownDevicesUseCaseImpl(repository: deviceRepository)
+        return DeviceListViewModel(getKnownDevicesUseCase: useCase)
     }
 
     func makeDeviceDetailViewModel(device: MatterDevice) -> DeviceDetailViewModel {
-        DeviceDetailViewModel(
+        return DeviceDetailViewModel(
             device: device,
-            toggleLedUseCase: toggleLedUseCase,
-            readTemperatureUseCase: readTemperatureUseCase,
-            readHeaterStateUseCase: readHeaterStateUseCase,
-            readCoolerStateUseCase: readCoolerStateUseCase
+            toggleLedUseCase: ToggleLedUseCase(repository: deviceRepository),
+            readTemperatureUseCase: ReadTemperatureUseCase(repository: deviceRepository)
         )
     }
 
     func makeQRScannerViewModel() -> QRScannerViewModel {
-        QRScannerViewModel(
-            commissionDeviceUseCase: commissionDeviceUseCase
-        )
+        let useCase = CommissionDeviceUseCase(repository: deviceRepository)
+        return QRScannerViewModel(commissionDeviceUseCase: useCase)
     }
 }

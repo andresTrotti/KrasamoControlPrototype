@@ -1,9 +1,16 @@
+//
+//  DeviceDetailView.swift
+//  ControlPrototype
+//
+//  Created by Andres Trotti on 1/23/26.
+//
+
+
 import SwiftUI
 
 struct DeviceDetailView: View {
     @StateObject var viewModel: DeviceDetailViewModel
     
-    // Configuración de la cuadrícula para escalabilidad (2 columnas)
     private let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
@@ -12,51 +19,8 @@ struct DeviceDetailView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // --- CABECERA DE ESTADO ---
                 headerView
-                
-                // --- CUADRÍCULA DE FEATURES (Aquí irán las 15+) ---
-                LazyVGrid(columns: columns, spacing: 16) {
-                    
-                    // Feature 1: Control de LED
-                    FeatureCard(
-                        title: "LED",
-                        value: viewModel.ledState == .on ? "Encendido" : "Apagado",
-                        icon: "lightbulb.fill",
-                        color: viewModel.ledState == .on ? .yellow : .gray,
-                        isActive: viewModel.ledState == .on,
-                        action: { viewModel.toggleLed() }
-                    )
-                    
-                    // Feature 2: Sensor de Temperatura (x917)
-                    FeatureCard(
-                        title: "Temperatura",
-                        value: viewModel.temperature?.displayValue ?? "--°C",
-                        icon: "thermometer.medium",
-                        color: .orange,
-                        action: { Task { await viewModel.refreshAll() } }
-                    )
-                    
-                    // Feature 3: Heater Status
-                    FeatureCard(
-                        title: "Heater",
-                        value: viewModel.heaterState == .on ? "Calentando" : "Inactivo",
-                        icon: "flame.fill",
-                        color: viewModel.heaterState == .on ? .red : .gray
-                    )
-                    
-                    // Feature 4: Cooler Status
-                    FeatureCard(
-                        title: "Cooler",
-                        value: viewModel.coolerState == .on ? "Enfriando" : "Inactivo",
-                        icon: "snowflake",
-                        color: viewModel.coolerState == .on ? .blue : .gray
-                    )
-                    
-                    // ESPACIO PARA LAS PRÓXIMAS 11+ FEATURES...
-                    // Simplemente añade más FeatureCards aquí.
-                }
-                .padding(.horizontal)
+                featuresGrid // Extraído para facilitar el type-check
             }
             .padding(.vertical)
         }
@@ -64,13 +28,68 @@ struct DeviceDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(uiColor: .systemGroupedBackground))
         .onAppear { viewModel.onAppear() }
-        .overlay {
-            if viewModel.isLoading {
-                ProgressView()
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(10)
-            }
+        .overlay { loadingOverlay }
+    }
+
+    // --- Sub-vistas extraídas ---
+
+    private var featuresGrid: some View {
+        LazyVGrid(columns: columns, spacing: 16) {
+            ledCard
+            temperatureCard
+            heaterCard
+            coolerCard
+            // Aquí podrás añadir las otras 11+ cards sin saturar el compilador
+        }
+        .padding(.horizontal)
+    }
+
+    private var ledCard: some View {
+        FeatureCard(
+            title: "LED",
+            value: viewModel.ledState == .on ? "Encendido" : "Apagado",
+            icon: "lightbulb.fill",
+            color: .yellow,
+            isActive: viewModel.ledState == .on,
+            action: { viewModel.toggleLed() }
+        )
+    }
+
+    private var temperatureCard: some View {
+        FeatureCard(
+            title: "Temperatura",
+            value: viewModel.temperature?.value.description ?? "N/A°C",
+            icon: "thermometer.medium",
+            color: .orange,
+            action: { Task { await viewModel.refreshAll() } }
+        )
+    }
+
+    private var heaterCard: some View {
+        FeatureCard(
+            title: "Heater",
+            value: viewModel.heaterState == .on ? "Calentando" : "Inactivo",
+            icon: "flame.fill",
+            color: viewModel.heaterState == .on ? .red : .gray
+        )
+    }
+
+    private var coolerCard: some View {
+        FeatureCard(
+            title: "Cooler",
+            value: viewModel.coolerState == .on ? "Enfriando" : "Inactivo",
+            icon: "snowflake",
+            color: viewModel.coolerState == .on ? .blue : .gray
+        )
+    }
+
+    @ViewBuilder
+    private var loadingOverlay: some View {
+        if viewModel.isLoading {
+            ProgressView()
+                .padding()
+                .background(.ultraThinMaterial)
+                .cornerRadius(10)
         }
     }
 

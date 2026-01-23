@@ -7,6 +7,6 @@
 
 
 enum CoolerState {
+    case on
     case off
-    case cooling
 }

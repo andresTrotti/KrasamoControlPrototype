@@ -28,52 +28,55 @@ func commissionMyX917(qrString: String, nodeId: UInt64) {
     let controller = MatterControllerFactory.makeController()
     
     do {
-        // 1. Parsear el QR
-        let payload = try MTRSetupPayload(setupPasscodeString: qrString)
+        // 1. Corrección del inicializador: Se usa 'onboardingPayload:' (o el string directo en versiones nuevas)
+        // Si 'onboardingPayload' falla, usa MTRSetupPayload(setupPasscodeString:) pero asegúrate de importar Matter correctamente.
+        let payload = try MTRSetupPayload(onboardingPayload: qrString)
         
-        // 2. Iniciar el Commissioning (Antes setupDevice)
-        // Este método busca el dispositivo via BLE, lo une a la red y lo configura
-        try controller.setupNode(forNodeID: NSNumber(value: nodeId),
-                                 onboardingPayload: payload)
+        // 2. Corrección del método: En Xcode 16.4 el controlador usa setupCommissioningSession
+        // o el método de conveniencia para emparejamiento directo.
+        try controller.setupCommissioningSession(with: payload,
+                                                 newNodeID: NSNumber(value: nodeId))
         
-        print("Proceso de Commissioning iniciado para el nodo \(nodeId)")
+        print("Sesión de emparejamiento abierta para el nodo \(nodeId)")
         
     } catch {
-        print("Error al iniciar el emparejamiento: \(error.localizedDescription)")
+        print("Error en el emparejamiento: \(error.localizedDescription)")
     }
 }
-
 
 
 enum MatterControllerFactory {
     static func makeController() -> MTRDeviceController {
         let factory = MTRDeviceControllerFactory.sharedInstance()
         let storage = MatterStorage()
-        let keypair = MatterKeypair() // Instanciamos nuestro firmante
-        
-        let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
-        
-        // Iniciamos la fábrica (solo una vez en el ciclo de vida de la app)
+        let keypair = MatterKeypair()
+
         if !factory.isRunning {
+            let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
             try? factory.start(factoryParams)
         }
 
-        let ipk = Data(count: 16)
-        
-        // CORRECCIÓN: Usamos nocSigner y fabricID
-        // El sellerID/VendorID se configura opcionalmente después si es necesario
-        let startupParams = MTRDeviceControllerStartupParams(ipk: ipk, fabricID: 1, nocSigner: keypair)
-        startupParams.vendorID = 0xFFF1 // Opcional: ID de prueba de Matter
-        
+        // IPK válido (16 bytes binarios)
+        let ipk = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
+
+        let startupParams = MTRDeviceControllerStartupParams(
+            ipk: ipk,
+            fabricID: 1,
+            nocSigner: keypair
+        )
+
+        startupParams.vendorID = 0xFFF1
+
         do {
-            // Si el fabric ya existe, usamos 'onExistingFabric'
-            // Si es la primera vez, se puede usar 'createController'
-            let controller = try factory.createController(onExistingFabric: startupParams)
-            return controller
+            return try factory.createController(onExistingFabric: startupParams)
         } catch {
-            // Manejo de error más limpio para escalabilidad
-            print("Fallo al crear controlador: \(error)")
-            fatalError("Detalle: \(error.localizedDescription)")
+            do {
+                return try factory.createController(onNewFabric: startupParams)
+            } catch {
+                fatalError("Error crítico al inicializar Matter: \(error.localizedDescription)")
+            }
         }
     }
 }
+
+

@@ -12,6 +12,8 @@ struct DeviceListView: View {
     @StateObject var viewModel: DeviceListViewModel
     let onSelectDevice: (MatterDevice) -> Void
     let onAddDevice: () -> Void
+    
+    
 
     var body: some View {
         NavigationStack {

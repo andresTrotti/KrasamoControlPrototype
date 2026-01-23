@@ -7,8 +7,8 @@
 
 
 enum HeaterState {
+    case on
     case off
-    case heating
 }
 
 

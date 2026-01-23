@@ -20,21 +20,20 @@ final class DeviceDetailViewModel: ObservableObject {
 
     private let toggleLedUseCase: ToggleLedUseCase
     private let readTemperatureUseCase: ReadTemperatureUseCase
-    private let readHeaterStateUseCase: ReadHeaterStateUseCase
-    private let readCoolerStateUseCase: ReadCoolerStateUseCase
+    
+    
 
     init(
         device: MatterDevice,
         toggleLedUseCase: ToggleLedUseCase,
         readTemperatureUseCase: ReadTemperatureUseCase,
-        readHeaterStateUseCase: ReadHeaterStateUseCase,
-        readCoolerStateUseCase: ReadCoolerStateUseCase
+        
+        
     ) {
         self.device = device
         self.toggleLedUseCase = toggleLedUseCase
         self.readTemperatureUseCase = readTemperatureUseCase
-        self.readHeaterStateUseCase = readHeaterStateUseCase
-        self.readCoolerStateUseCase = readCoolerStateUseCase
+       
     }
 
     func onAppear() {
@@ -47,8 +46,7 @@ final class DeviceDetailViewModel: ObservableObject {
 
         do {
             temperature = try await readTemperatureUseCase.execute(deviceID: device.deviceID)
-            heaterState = try await readHeaterStateUseCase.execute(deviceID: device.deviceID)
-            coolerState = try await readCoolerStateUseCase.execute(deviceID: device.deviceID)
+        
         } catch {
             errorMessage = "Error al actualizar estados"
         }

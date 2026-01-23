@@ -4,93 +4,78 @@
 //
 //  Created by Andres Trotti on 1/23/26.
 //
-
 import Matter
 
-
-// Data
-
 final class MatterDeviceRepositoryImpl: MatterDeviceRepository {
-    private let controller: MTRDeviceController // o el tipo actual del SDK
-
     
+    
+    
+    private let controller: MTRDeviceController
+
     init(controller: MTRDeviceController) {
         self.controller = controller
     }
+    
+   
+    
+    
 
-    func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
-        // Nuevo inicializador recomendado por Apple
-        var parseError: NSError?
-        guard let setupPayload = MTRSetupPayload(payload: qrString) else {
-            throw parseError ?? NSError(
-                domain: "Matter",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "No se pudo parsear el código Matter"]
-            )
+    // FEATURE: Control de LED (OnOff)
+    func toggleLed(for deviceID: MatterDeviceID, to state: LedState) async throws {
+        let device = MTRDevice(nodeID: NSNumber(value: deviceID.rawValue), controller: self.controller)
+        
+        // Desenvolver el clúster opcional
+        guard let onOffCluster = MTRClusterOnOff(device: device, endpointID: 1, queue: .main) else {
+            throw NSError(domain: "Matter", code: -1, userInfo: [NSLocalizedDescriptionKey: "No se pudo instanciar el clúster OnOff"])
+        }
+        
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            let completion: (Error?) -> Void = { error in
+                if let error = error { continuation.resume(throwing: error) }
+                else { continuation.resume() }
+            }
+            
+            // Xcode 16.4+ prefiere este formato para comandos
+            if state == .on {
+                onOffCluster.on(with: nil, expectedValues: nil, expectedValueInterval: nil, completion: completion)
+            } else {
+                onOffCluster.off(with: nil, expectedValues: nil, expectedValueInterval: nil, completion: completion)
+            }
+        }
+    }
+
+    func readTemperature(for deviceID: MatterDeviceID) async throws -> TemperatureReading {
+        let device = MTRDevice(nodeID: NSNumber(value: deviceID.rawValue), controller: self.controller)
+        guard let tempCluster = MTRClusterTemperatureMeasurement(device: device, endpointID: 1, queue: .main) else {
+            throw NSError(domain: "Matter", code: -1)
         }
 
-        let commissioningParams = MTRCommissioningParameters()
-        commissioningParams.setupPayload = setupPayload
-
-        let nodeID = try await withCheckedThrowingContinuation { continuation in
-            controller.commissionDevice(
-                with: commissioningParams,
-                commissioningComplete: { error in
-                    if let error = error {
-                        continuation.resume(throwing: error)
-                    } else {
-                        continuation.resume(returning: commissioningParams.deviceID)
-                    }
-                }
-            )
+        let value = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<NSNumber, Error>) in
+            // El completion DEBE ir dentro del paréntesis para evitar el "Extra trailing closure"
+            tempCluster.readAttributeMeasuredValue(with: nil)
         }
 
-        return MatterDevice(
-            deviceID: MatterDeviceID(rawValue: nodeID),
-            name: "x917",
-            isOnline: true
+        return TemperatureReading(
+            value: Double(truncating: value) / 100.0,
+            unit: "°C",
+            timestamp: Date()
         )
     }
 
-
-    func getKnownDevices() async throws -> [MatterDevice] {
-        // Leer de storage local + validar con controller si siguen online
-        []
-    }
-
-    func toggleLed(for device: MatterDeviceID, to state: LedState) async throws {
-        // Usar clusters de Matter (OnOff cluster) para mandar comando
-        /*
-        let device = try await controller.device(forNodeID: device.rawValue)
-        let onOffCluster = MTRClusterOnOff(device: device, endpoint: 1, queue: .main)
-        if state == .on {
-            try await onOffCluster.on()
-        } else {
-            try await onOffCluster.off()
+    // FEATURE: Revisar Estados de Heater (Thermostat)
+    func readHeaterState(for deviceID: MatterDeviceID) async throws -> HeaterState {
+        let device = MTRDevice(nodeID: NSNumber(value: deviceID.rawValue), controller: self.controller)
+        
+        guard let thermostatCluster = MTRClusterThermostat(device: device, endpointID: 1, queue: .main) else {
+            return .off
         }
-        */
-    }
-
-    func readTemperature(for device: MatterDeviceID) async throws -> TemperatureReading {
-        /*
-        let device = try await controller.device(forNodeID: device.rawValue)
-        let tempCluster = MTRClusterTemperatureMeasurement(device: device, endpoint: 1, queue: .main)
-        let attributes = try await tempCluster.readAttributes()
-        let value = attributes.measuredValue
-        return TemperatureReading(value: Double(value) / 100.0,
-                                  unit: "°C",
-                                  timestamp: Date())
-        */
-        throw NSError(domain: "NotImplemented", code: -1)
-    }
-
-    func readHeaterState(for device: MatterDeviceID) async throws -> HeaterState {
-        // Leer cluster correspondiente (ej. Thermostat / HVAC)
-        .off
-    }
-
-    func readCoolerState(for device: MatterDeviceID) async throws -> CoolerState {
-        // Igual que arriba
-        .off
+        
+        let mode = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<NSNumber, Error>) in
+            thermostatCluster.readAttributeSystemMode(with: nil)
+        }
+        
+        // Ajusta esto según cómo hayas definido tu enum HeaterState
+        // 4 = Heat en el estándar Matter
+        return Int(truncating: mode) == 4 ? .on : .off
     }
 }
