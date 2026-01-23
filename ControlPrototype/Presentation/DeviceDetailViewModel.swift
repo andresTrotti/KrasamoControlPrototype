@@ -1,4 +1,12 @@
-// Presentation
+//
+//  DeviceDetailViewModel 2.swift
+//  ControlPrototype
+//
+//  Created by Andres Trotti on 1/23/26.
+//
+
+import Foundation
+
 
 @MainActor
 final class DeviceDetailViewModel: ObservableObject {
@@ -7,27 +15,30 @@ final class DeviceDetailViewModel: ObservableObject {
     @Published var temperature: TemperatureReading?
     @Published var heaterState: HeaterState = .off
     @Published var coolerState: CoolerState = .off
-    @Published var isLoading: Bool = false
+    @Published var isLoading = false
     @Published var errorMessage: String?
 
     private let toggleLedUseCase: ToggleLedUseCase
     private let readTemperatureUseCase: ReadTemperatureUseCase
-    // Podrías tener ReadHeaterStateUseCase, ReadCoolerStateUseCase, etc.
+    private let readHeaterStateUseCase: ReadHeaterStateUseCase
+    private let readCoolerStateUseCase: ReadCoolerStateUseCase
 
     init(
         device: MatterDevice,
         toggleLedUseCase: ToggleLedUseCase,
-        readTemperatureUseCase: ReadTemperatureUseCase
+        readTemperatureUseCase: ReadTemperatureUseCase,
+        readHeaterStateUseCase: ReadHeaterStateUseCase,
+        readCoolerStateUseCase: ReadCoolerStateUseCase
     ) {
         self.device = device
         self.toggleLedUseCase = toggleLedUseCase
         self.readTemperatureUseCase = readTemperatureUseCase
+        self.readHeaterStateUseCase = readHeaterStateUseCase
+        self.readCoolerStateUseCase = readCoolerStateUseCase
     }
 
     func onAppear() {
-        Task {
-            await refreshAll()
-        }
+        Task { await refreshAll() }
     }
 
     func refreshAll() async {
@@ -35,11 +46,11 @@ final class DeviceDetailViewModel: ObservableObject {
         defer { isLoading = false }
 
         do {
-            let temp = try await readTemperatureUseCase.execute(deviceID: device.id)
-            temperature = temp
-            // Aquí llamarías a otros use cases para heater/cooler
+            temperature = try await readTemperatureUseCase.execute(deviceID: device.deviceID)
+            heaterState = try await readHeaterStateUseCase.execute(deviceID: device.deviceID)
+            coolerState = try await readCoolerStateUseCase.execute(deviceID: device.deviceID)
         } catch {
-            errorMessage = "Error al actualizar datos: \(error.localizedDescription)"
+            errorMessage = "Error al actualizar estados"
         }
     }
 
@@ -49,12 +60,11 @@ final class DeviceDetailViewModel: ObservableObject {
             defer { isLoading = false }
 
             let newState: LedState = (ledState == .on) ? .off : .on
-
             do {
-                try await toggleLedUseCase.execute(deviceID: device.id, to: newState)
+                try await toggleLedUseCase.execute(deviceID: device.deviceID, to: newState)
                 ledState = newState
             } catch {
-                errorMessage = "No se pudo cambiar el LED: \(error.localizedDescription)"
+                errorMessage = "No se pudo cambiar el LED"
             }
         }
     }
