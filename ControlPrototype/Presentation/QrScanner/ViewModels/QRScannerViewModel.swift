@@ -25,18 +25,21 @@ final class QRScannerViewModel: ObservableObject {
     func handleScannedCode(_ qr: String) {
         guard !isProcessing else { return }
 
+        // 1. Capturamos la referencia localmente
+        let useCase = self.commissionDeviceUseCase
+        
         isProcessing = true
         errorMessage = nil
 
         Task {
+            defer { isProcessing = false }
             do {
-                let device = try await commissionDeviceUseCase.execute(qrString: qr)
+                // 2. Usamos la referencia capturada
+                let device = try await useCase.execute(qrString: qr)
                 onDeviceCommissioned?(device)
             } catch {
                 errorMessage = "Error al comisionar: \(error.localizedDescription)"
             }
-
-            isProcessing = false
         }
     }
 }

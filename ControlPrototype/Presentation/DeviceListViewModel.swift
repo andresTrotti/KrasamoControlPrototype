@@ -8,6 +8,7 @@
 
 import Foundation
 
+
 @MainActor
 final class DeviceListViewModel: ObservableObject {
     @Published var devices: [MatterDevice] = []
@@ -15,23 +16,24 @@ final class DeviceListViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let getKnownDevicesUseCase: GetKnownDevicesUseCase
-    
-    
 
     init(getKnownDevicesUseCase: GetKnownDevicesUseCase) {
         self.getKnownDevicesUseCase = getKnownDevicesUseCase
     }
 
     func load() {
+        let useCase = self.getKnownDevicesUseCase // Captura local fuera de la Task
+        
         Task {
             isLoading = true
             defer { isLoading = false }
-
             do {
-                devices = try await getKnownDevicesUseCase.execute()
+                devices = try await useCase.execute() // Usamos la local
             } catch {
-                errorMessage = "No se pudieron cargar los dispositivos"
+                errorMessage = "Error"
             }
         }
     }
 }
+
+

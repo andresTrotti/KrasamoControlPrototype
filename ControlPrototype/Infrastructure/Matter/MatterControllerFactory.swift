@@ -46,43 +46,39 @@ func commissionMyX917(qrString: String, nodeId: UInt64) {
 
 
 
-enum MatterControllerFactory {
 
+import Foundation
+import Matter
+
+enum MatterControllerFactory {
     static func makeController() -> MTRDeviceController {
-        let factory = MTRDeviceControllerFactory.sharedInstance()
         let storage = MatterStorage()
         let keypair = MatterKeypair()
+        let ipk = Data([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F])
 
-        // Iniciar el factory si aún no está corriendo
-        if !factory.isRunning {
-            let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
-            do {
-                try factory.start(factoryParams)
-            } catch {
-                fatalError("No se pudo iniciar MTRDeviceControllerFactory: \(error)")
-            }
-        }
+        // 1. Inicialización obligatoria (IPK, FabricID, Keypair)
+        let params = MTRDeviceControllerStartupParams(ipk: ipk, fabricID: 1, nocSigner: keypair)
+        params.vendorID = NSNumber(value: 0xFFF1)
 
-        // IPK binaria válida (16 bytes aleatorios)
-        let ipk = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
-
-        let startupParams = MTRDeviceControllerStartupParams(
-            ipk: ipk,
-            fabricID: 1,
-            nocSigner: keypair
-        )
-        startupParams.vendorID = 0xFFF1  // Vendor ID de prueba
-
-        // Intentar reutilizar fabric existente; si no existe, crear uno nuevo
         do {
-            return try factory.createController(onExistingFabric: startupParams)
-        } catch {
-            do {
-                return try factory.createController(onNewFabric: startupParams)
-            } catch {
-                fatalError("Error crítico al crear Matter controller: \(error)")
+            let factory = MTRDeviceControllerFactory.sharedInstance()
+            
+            // 2. Iniciar la factoría si no está corriendo
+            if !factory.isRunning {
+                let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
+                try factory.start(factoryParams)
             }
+            
+            // 3. CORRECCIÓN: createController(with: params)
+            // Asegúrate de usar 'try' y que 'params' sea exactamente el objeto de arriba
+            return try factory.createController(onNewFabric: params)
+            
+        } catch {
+            fatalError("Error crítico: \(error.localizedDescription)")
         }
     }
 }
+
+
 

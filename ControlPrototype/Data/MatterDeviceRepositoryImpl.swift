@@ -4,12 +4,96 @@
 //
 //  Created by Andres Trotti on 1/23/26.
 //
-import Matter
+@preconcurrency import Matter
 
-final class MatterDeviceRepositoryImpl: MatterDeviceRepository {
+@MainActor
+final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
+    // Firma actualizada
+    // Asegúrate de que tu Repositorio o Clase tenga: import Matter
+
+    func readAttribute(for deviceID: String, endpointID: UInt16, clusterID: UInt32, attributeID: UInt32) async throws -> any Sendable {
+            
+        // 1. Validar ID
+        guard let nodeID = UInt64(deviceID) else {
+            throw MatterError.invalidDeviceID
+        }
+        
+        // 2. Preparar Dispositivo y Ruta
+        let device = MTRDevice(nodeID: NSNumber(value: nodeID), controller: self.controller)
+        let path = MTRAttributeRequestPath(endpointID: NSNumber(value: endpointID),
+                                           clusterID: NSNumber(value: clusterID),
+                                           attributeID: NSNumber(value: attributeID))
+        
+        // 3. Llamada al SDK (Devuelve un Array de diccionarios)
+        // Usamos 'await' para esperar la respuesta del chip
+        let reports = try await device.readAttributePaths([path])
+        
+        // ---------------------------------------------------------------
+        // AQUÍ ESTABA EL ERROR: Definimos 'firstReport'
+        // ---------------------------------------------------------------
+        guard let firstReport = reports.first else {
+            throw MatterError.attributeNotFound
+        }
+        
+        guard let value = firstReport["data"] ?? firstReport["value"] else {
+                throw MatterError.attributeNotFound
+            }
+            
+            // 6. CORRECCIÓN: Validación por Tipos Concretos
+            // En lugar de preguntar "¿eres Sendable?", preguntamos "¿eres un Número?".
+            // Al devolver un tipo concreto que es Sendable, el compilador queda satisfecho.
+            
+            if let number = value as? NSNumber {
+                return number // ✅ NSNumber es Sendable
+            }
+            else if let text = value as? String {
+                return text // ✅ String es Sendable
+            }
+            else if let data = value as? Data {
+                return data // ✅ Data es Sendable
+            }
+        
+        // Si llega algo complejo (como un Array o Diccionario anidado), por ahora fallamos
+            print("❌ Tipo de dato no soportado o no seguro: \(type(of: value))")
+            throw MatterError.invalidDataFormat
+    }
     
+   
     
+    func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
+        
     
+        // AHORA ESTO ES SEGURO:
+                // Como ambos están en el MainActor, no hay "frontera" que cruzar.
+        let controller = await AppContainer.shared.matterController
+                
+                print("Procesando QR: \(qrString)")
+                let setupPayload = try MTRSetupPayload(onboardingPayload: qrString)
+                
+                // Parche del Discriminator (si aplica)
+                if setupPayload.discriminator == NSNumber(value: 1234) {
+                    setupPayload.discriminator = NSNumber(value: 3840)
+                }
+
+                let nodeID = NSNumber(value: UInt64(Date().timeIntervalSince1970))
+
+                // IMPORTANTE:
+                // Aunque estemos en @MainActor, el 'await' suspende la función.
+                // La UI NO se congelará. El hilo principal queda libre para pintar
+                // mientras el SDK trabaja por debajo.
+                try await controller.setupCommissioningSession(with: setupPayload, newNodeID: nodeID)
+        // 1. Convertimos el ID (Directamente, sin guard)
+            let myID = MatterDeviceID(rawValue: nodeID.uint64Value)
+
+            // 2. Retornamos el modelo
+            return MatterDevice(
+                deviceID: myID,
+                name: "Matter Device (Conectando...)",
+                isOnline: false
+            )
+    }
+    
+   
     private let controller: MTRDeviceController
 
     init(controller: MTRDeviceController) {
@@ -17,7 +101,7 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository {
     }
     
    
-    
+  
     
 
     // FEATURE: Control de LED (OnOff)

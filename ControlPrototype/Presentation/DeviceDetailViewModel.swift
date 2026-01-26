@@ -41,26 +41,40 @@ final class DeviceDetailViewModel: ObservableObject {
     }
 
     func refreshAll() async {
+        /*let useCase = self.readTemperatureUseCase
+        let deviceIDString = String(describing: device.deviceID)
+
         isLoading = true
         defer { isLoading = false }
 
         do {
-            temperature = try await readTemperatureUseCase.execute(deviceID: device.deviceID)
-        
+            let value = try await useCase.execute(deviceID: deviceIDString)
+            
+            // CORRECCIÓN: Creamos el objeto TemperatureReading
+            // Asumo que tu struct tiene un inicializador que acepta el valor y quizás la fecha
+            self.temperature = TemperatureReading(value: value, unit: "Unit", timestamp: Date())
+            
         } catch {
             errorMessage = "Error al actualizar estados"
-        }
+        }*/
     }
+    
+   
 
     func toggleLed() {
+        // 1. Capturamos las propiedades fuera de la Task
+        let useCase = self.toggleLedUseCase
+        let deviceID = device.deviceID
+        let targetState: LedState = (ledState == .on) ? .off : .on
+
         Task {
             isLoading = true
             defer { isLoading = false }
 
-            let newState: LedState = (ledState == .on) ? .off : .on
             do {
-                try await toggleLedUseCase.execute(deviceID: device.deviceID, to: newState)
-                ledState = newState
+                // 2. Usamos las constantes capturadas
+                try await useCase.execute(deviceID: deviceID, to: targetState)
+                ledState = targetState
             } catch {
                 errorMessage = "No se pudo cambiar el LED"
             }

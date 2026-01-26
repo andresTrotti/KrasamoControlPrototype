@@ -9,13 +9,14 @@
 import Foundation
 import Matter
 
-protocol MatterDeviceRepository {
+protocol MatterDeviceRepository: Sendable {
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice
     func getKnownDevices() async throws -> [MatterDevice]
     func toggleLed(for device: MatterDeviceID, to state: LedState) async throws
     func readTemperature(for device: MatterDeviceID) async throws -> TemperatureReading
     func readHeaterState(for device: MatterDeviceID) async throws -> HeaterState
     func readCoolerState(for device: MatterDeviceID) async throws -> CoolerState
+    func readAttribute(for deviceID: String, endpointID: UInt16, clusterID: UInt32, attributeID: UInt32) async throws -> any Sendable
 }
 
 extension MatterDeviceRepository {
@@ -25,32 +26,7 @@ extension MatterDeviceRepository {
         return []
     }
 
-
-    func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
-        // 1. Parsear QR
-        let setupPayload = try MTRSetupPayload(onboardingPayload: qrString)
-
-        // 2. Crear parámetros
-        let params = MTRCommissioningParameters()
-
-        // 3. Obtener controller
-        let controller = MatterControllerFactory.makeController()
-
-        // 4. NodeID
-        let nodeID: UInt64 = 0x1234
-
-        // 5. Llamar al método correcto (el único que tu SDK soporta)
-        try controller.commissionDevice(nodeID, commissioningParams: params)
-
-        // 6. Devolver tu modelo
-        return MatterDevice(
-            deviceID: MatterDeviceID(rawValue: nodeID),
-            name: "Matter Device",
-            isOnline: true
-        )
-    }
-
-
+  
 
 
     // Valor por defecto para el LED (no hace nada)
