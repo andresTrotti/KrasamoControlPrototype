@@ -7,6 +7,7 @@
 
 
 import Foundation
+import Matter
 
 protocol MatterDeviceRepository {
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice
@@ -23,10 +24,34 @@ extension MatterDeviceRepository {
     func getKnownDevices() async throws -> [MatterDevice] {
         return []
     }
-    
+
+
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
-        fatalError("Not implemented")
+        // 1. Parsear QR
+        let setupPayload = try MTRSetupPayload(onboardingPayload: qrString)
+
+        // 2. Crear parámetros
+        let params = MTRCommissioningParameters()
+
+        // 3. Obtener controller
+        let controller = MatterControllerFactory.makeController()
+
+        // 4. NodeID
+        let nodeID: UInt64 = 0x1234
+
+        // 5. Llamar al método correcto (el único que tu SDK soporta)
+        try controller.commissionDevice(nodeID, commissioningParams: params)
+
+        // 6. Devolver tu modelo
+        return MatterDevice(
+            deviceID: MatterDeviceID(rawValue: nodeID),
+            name: "Matter Device",
+            isOnline: true
+        )
     }
+
+
+
 
     // Valor por defecto para el LED (no hace nada)
     func toggleLed(for device: MatterDeviceID, to state: LedState) async throws {

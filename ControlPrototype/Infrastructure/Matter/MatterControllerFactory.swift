@@ -45,18 +45,25 @@ func commissionMyX917(qrString: String, nodeId: UInt64) {
 }
 
 
+
 enum MatterControllerFactory {
+
     static func makeController() -> MTRDeviceController {
         let factory = MTRDeviceControllerFactory.sharedInstance()
         let storage = MatterStorage()
         let keypair = MatterKeypair()
 
+        // Iniciar el factory si aún no está corriendo
         if !factory.isRunning {
             let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
-            try? factory.start(factoryParams)
+            do {
+                try factory.start(factoryParams)
+            } catch {
+                fatalError("No se pudo iniciar MTRDeviceControllerFactory: \(error)")
+            }
         }
 
-        // IPK válido (16 bytes binarios)
+        // IPK binaria válida (16 bytes aleatorios)
         let ipk = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
 
         let startupParams = MTRDeviceControllerStartupParams(
@@ -64,19 +71,18 @@ enum MatterControllerFactory {
             fabricID: 1,
             nocSigner: keypair
         )
+        startupParams.vendorID = 0xFFF1  // Vendor ID de prueba
 
-        startupParams.vendorID = 0xFFF1
-
+        // Intentar reutilizar fabric existente; si no existe, crear uno nuevo
         do {
             return try factory.createController(onExistingFabric: startupParams)
         } catch {
             do {
                 return try factory.createController(onNewFabric: startupParams)
             } catch {
-                fatalError("Error crítico al inicializar Matter: \(error.localizedDescription)")
+                fatalError("Error crítico al crear Matter controller: \(error)")
             }
         }
     }
 }
-
 

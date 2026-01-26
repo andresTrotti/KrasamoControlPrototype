@@ -9,13 +9,15 @@
 import Foundation
 import Matter
 
+
+@objcMembers
 final class MatterKeypair: NSObject, MTRKeypair {
 
     private let privateKey: SecKey
     private let publicKeyRef: SecKey
 
     override init() {
-        // Generar clave EC P-256
+        // Clave EC P-256
         let attributes: [String: Any] = [
             kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
             kSecAttrKeySizeInBits as String: 256,
@@ -33,19 +35,19 @@ final class MatterKeypair: NSObject, MTRKeypair {
         self.publicKeyRef = SecKeyCopyPublicKey(privateKey)!
     }
 
-    func publicKey() -> Data {
-        var error: Unmanaged<CFError>?
-        guard let data = SecKeyCopyExternalRepresentation(publicKeyRef, &error) else {
-            fatalError("No se pudo obtener la clave pública: \(error!.takeRetainedValue())")
-        }
-        return data as Data
+    // DEPRECATED en el header, pero perfectamente válido para tu SDK actual.
+    // El protocolo dice: optional func publicKey() -> Unmanaged<SecKey>
+    func publicKey() -> Unmanaged<SecKey> {
+        return Unmanaged.passRetained(publicKeyRef)
     }
 
-    func signMessage(_ message: Data) -> Data {
+    // Usamos la variante DER, que el bridge sabe interpretar.
+    // optional func signMessageECDSA_DER(_ message: Data) -> Data
+    func signMessageECDSA_DER(_ message: Data) -> Data {
         var error: Unmanaged<CFError>?
         guard let signature = SecKeyCreateSignature(
             privateKey,
-            .ecdsaSignatureMessageX962SHA256,
+            .ecdsaSignatureMessageX962SHA256,   // firma DER sobre el mensaje
             message as CFData,
             &error
         ) else {
