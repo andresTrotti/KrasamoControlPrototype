@@ -14,11 +14,17 @@ struct QRScannerView: View {
 
     var body: some View {
         ZStack {
-            QRScannerRepresentable(
-                onQRCodeScanned: { qr in
-                    viewModel.handleScannedCode(qr)
-                }
-            )
+            
+            
+            // Pasamos el binding $isProcessing
+                        QRScannerRepresentable(
+                            isProcessing: $viewModel.isProcessing,
+                            onQRCodeScanned: { code in
+                                viewModel.handleScannedCode(code)
+                            }
+                        )
+                        
+                       
 
             if viewModel.isProcessing {
                 Color.black.opacity(0.4)

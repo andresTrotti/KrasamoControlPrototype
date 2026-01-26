@@ -9,7 +9,10 @@
 import SwiftUI
 import VisionKit
 
+
 struct QRScannerRepresentable: UIViewControllerRepresentable {
+    // 1. Recibimos el estado de procesamiento para saber si debemos escanear o no
+    @Binding var isProcessing: Bool
     let onQRCodeScanned: (String) -> Void
 
     func makeUIViewController(context: Context) -> DataScannerViewController {
@@ -25,21 +28,31 @@ struct QRScannerRepresentable: UIViewControllerRepresentable {
         return controller
     }
 
+    // 2. Aquí está la corrección mágica
     func updateUIViewController(_ uiViewController: DataScannerViewController, context: Context) {
-        if !uiViewController.isScanning {
-            try? uiViewController.startScanning()
+        // Si estamos procesando, DETENEMOS el scanner
+        if isProcessing {
+            if uiViewController.isScanning {
+                uiViewController.stopScanning()
+            }
+        }
+        // Si NO estamos procesando y el scanner está apagado, lo ENCENDEMOS
+        else {
+            if !uiViewController.isScanning {
+                try? uiViewController.startScanning()
+            }
         }
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onQRCodeScanned: onQRCodeScanned)
+        Coordinator(parent: self)
     }
 
     final class Coordinator: NSObject, DataScannerViewControllerDelegate {
-        let onQRCodeScanned: (String) -> Void
+        let parent: QRScannerRepresentable
 
-        init(onQRCodeScanned: @escaping (String) -> Void) {
-            self.onQRCodeScanned = onQRCodeScanned
+        init(parent: QRScannerRepresentable) {
+            self.parent = parent
         }
 
         func dataScanner(_ dataScanner: DataScannerViewController,
@@ -49,7 +62,13 @@ struct QRScannerRepresentable: UIViewControllerRepresentable {
 
             if case let .barcode(barcode) = item,
                let payload = barcode.payloadStringValue {
-                onQRCodeScanned(payload)
+                
+                // 3. Importante: Detenemos inmediatamente para evitar lecturas dobles
+                // y evitar el crash de AVCaptureSession
+                dataScanner.stopScanning()
+                
+                // Llamamos al callback
+                parent.onQRCodeScanned(payload)
             }
         }
     }
