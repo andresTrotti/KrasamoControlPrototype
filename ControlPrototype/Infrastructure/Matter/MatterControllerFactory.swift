@@ -75,6 +75,7 @@ enum MatterControllerFactory {
             return try factory.createController(onNewFabric: params)
             
         } catch {
+            print("error: \(error.localizedDescription)")
             fatalError("Error crítico: \(error.localizedDescription)")
         }
     }

@@ -23,22 +23,30 @@ final class QRScannerViewModel: ObservableObject {
     }
 
     func handleScannedCode(_ qr: String) {
-        guard !isProcessing else { return }
+        // 1. Bloqueo estricto
+        guard !isProcessing else {
+            print("⚠️ Ignorando QR: Ya hay una operación en curso")
+            return
+        }
 
-        // 1. Capturamos la referencia localmente
-        let useCase = self.commissionDeviceUseCase
-        
         isProcessing = true
         errorMessage = nil
 
         Task {
-            defer { isProcessing = false }
+            defer {
+                // 2. No desbloquees inmediatamente, espera un poco
+                // para que el SDK de Matter limpie su estado interno.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    self.isProcessing = false
+                }
+            }
+            
             do {
-                // 2. Usamos la referencia capturada
-                let device = try await useCase.execute(qrString: qr)
+                let device = try await commissionDeviceUseCase.execute(qrString: qr)
                 onDeviceCommissioned?(device)
             } catch {
-                errorMessage = "Error al comisionar: \(error.localizedDescription)"
+                print("❌ Error de Matter: \(error)")
+                self.errorMessage = error.localizedDescription
             }
         }
     }

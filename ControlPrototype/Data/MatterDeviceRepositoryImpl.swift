@@ -61,36 +61,24 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
    
     
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
-        
-    
-        // AHORA ESTO ES SEGURO:
-                // Como ambos están en el MainActor, no hay "frontera" que cruzar.
         let controller = await AppContainer.shared.matterController
-                
-                print("Procesando QR: \(qrString)")
-                let setupPayload = try MTRSetupPayload(onboardingPayload: qrString)
-                
-                // Parche del Discriminator (si aplica)
-                if setupPayload.discriminator == NSNumber(value: 1234) {
-                    setupPayload.discriminator = NSNumber(value: 3840)
-                }
+        let setupPayload = try MTRSetupPayload(onboardingPayload: qrString)
+        let nodeID = NSNumber(value: UInt64(Date().timeIntervalSince1970))
+        
+        print("Iniciando sesión de comisionamiento para el Nodo: \(nodeID)")
 
-                let nodeID = NSNumber(value: UInt64(Date().timeIntervalSince1970))
+        // 1. Llamada corregida según la firma de tu SDK (sin await y sin parámetros extra)
+        // Nota: Aunque la función es 'throws', al estar en un entorno async,
+        // Swift permite usar 'try' directamente.
+        try controller.setupCommissioningSession(with: setupPayload, newNodeID: nodeID)
 
-                // IMPORTANTE:
-                // Aunque estemos en @MainActor, el 'await' suspende la función.
-                // La UI NO se congelará. El hilo principal queda libre para pintar
-                // mientras el SDK trabaja por debajo.
-                try await controller.setupCommissioningSession(with: setupPayload, newNodeID: nodeID)
-        // 1. Convertimos el ID (Directamente, sin guard)
-            let myID = MatterDeviceID(rawValue: nodeID.uint64Value)
+        let myID = MatterDeviceID(rawValue: nodeID.uint64Value)
 
-            // 2. Retornamos el modelo
-            return MatterDevice(
-                deviceID: myID,
-                name: "Matter Device (Conectando...)",
-                isOnline: false
-            )
+        return MatterDevice(
+            deviceID: myID,
+            name: "SiLabs Light",
+            isOnline: false
+        )
     }
     
    
