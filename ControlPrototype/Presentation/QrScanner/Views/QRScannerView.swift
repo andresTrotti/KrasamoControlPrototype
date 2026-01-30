@@ -5,7 +5,6 @@
 //  Created by Andres Trotti on 1/23/26.
 //
 
-
 import SwiftUI
 import VisionKit
 
@@ -14,17 +13,14 @@ struct QRScannerView: View {
 
     var body: some View {
         ZStack {
-            
-            
+
             // Pasamos el binding $isProcessing
-                        QRScannerRepresentable(
-                            isProcessing: $viewModel.isProcessing,
-                            onQRCodeScanned: { code in
-                                viewModel.handleScannedCode(code)
-                            }
-                        )
-                        
-                       
+            QRScannerRepresentable(
+                isProcessing: $viewModel.isProcessing,
+                onQRCodeScanned: { code in
+                    viewModel.handleScannedCode(code)
+                }
+            )
 
             if viewModel.isProcessing {
                 Color.black.opacity(0.4)

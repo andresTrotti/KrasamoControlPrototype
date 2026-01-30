@@ -67,10 +67,28 @@ final class AppContainer: NSObject, ObservableObject {
 // MARK: - MTRDeviceControllerDelegate
 extension AppContainer: MTRDeviceControllerDelegate {
     
-    // 1. Agregamos 'nonisolated' para cumplir con el protocolo
+    // 1. Para ver el progreso paso a paso (Configurando red, verificando certificados, etc.)
+    nonisolated func controller(_ controller: MTRDeviceController, statusUpdate status: MTRCommissioningStatus) {
+        print("Estado del comisionamiento: \(status.rawValue)")
+    }
+
+    // 2. Para saber cuándo terminó la fase PASE (Bluetooth/Seguridad inicial)
     nonisolated func controller(_ controller: MTRDeviceController, commissioningSessionEstablishmentDone error: Error?) {
+        if let error = error {
+            print("❌ Error en fase Bluetooth (PASE): \(error.localizedDescription)")
+            return
+        }
+        print("🔵 Bluetooth establecido y seguro. Enviando credenciales Wi-Fi al x917...")
+    }
+
+        
+     
+    
+    
+     func controller(_ controller: MTRDeviceController, commissioningSessionEstablishmentDone error: Error?, statusUpdate status: MTRCommissioningStatus) {
         // Como es nonisolated, no podemos tocar propiedades de 'self' directamente sin 'await'
         // Pero los print son seguros.
+        print("Estado del comisionamiento: \(status.rawValue)")
         
         if let error = error {
             print("❌ Error en fase Bluetooth (PASE): \(error.localizedDescription)")
@@ -79,8 +97,10 @@ extension AppContainer: MTRDeviceControllerDelegate {
         print("🔵 Bluetooth establecido. Enviando credenciales Wi-Fi al x917...")
     }
 
-    // 2. Agregamos 'nonisolated' aquí también
+    
     nonisolated func controller(_ controller: MTRDeviceController, commissioningComplete error: Error?, nodeID: NSNumber?) {
+        print(">>> Bluetooth en modo PASE (CASE).\n")
+        
         if let error = error {
             print("❌ Error en fase Wi-Fi/Certificados (CASE): \(error.localizedDescription)")
             return

@@ -35,14 +35,12 @@ final class MatterKeypair: NSObject, MTRKeypair {
         self.publicKeyRef = SecKeyCopyPublicKey(privateKey)!
     }
 
-    // DEPRECATED en el header, pero perfectamente válido para tu SDK actual.
-    // El protocolo dice: optional func publicKey() -> Unmanaged<SecKey>
+  
     func publicKey() -> Unmanaged<SecKey> {
         return Unmanaged.passRetained(publicKeyRef)
     }
 
-    // Usamos la variante DER, que el bridge sabe interpretar.
-    // optional func signMessageECDSA_DER(_ message: Data) -> Data
+    
     func signMessageECDSA_DER(_ message: Data) -> Data {
         var error: Unmanaged<CFError>?
         guard let signature = SecKeyCreateSignature(

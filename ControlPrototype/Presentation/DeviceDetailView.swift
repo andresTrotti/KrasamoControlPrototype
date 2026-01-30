@@ -31,7 +31,7 @@ struct DeviceDetailView: View {
         .overlay { loadingOverlay }
     }
 
-    // --- Sub-vistas extraídas ---
+    
 
     private var featuresGrid: some View {
         LazyVGrid(columns: columns, spacing: 16) {
@@ -108,3 +108,5 @@ struct DeviceDetailView: View {
         .frame(maxWidth: .infinity)
     }
 }
+
+

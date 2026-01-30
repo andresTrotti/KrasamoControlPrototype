@@ -25,7 +25,7 @@ final class QRScannerViewModel: ObservableObject {
     func handleScannedCode(_ qr: String) {
         // 1. Bloqueo estricto
         guard !isProcessing else {
-            print("⚠️ Ignorando QR: Ya hay una operación en curso")
+            print("Ignorando QR: Ya hay una operación en curso")
             return
         }
 
@@ -45,7 +45,7 @@ final class QRScannerViewModel: ObservableObject {
                 let device = try await commissionDeviceUseCase.execute(qrString: qr)
                 onDeviceCommissioned?(device)
             } catch {
-                print("❌ Error de Matter: \(error)")
+                print("Error de Matter: \(error)")
                 self.errorMessage = error.localizedDescription
             }
         }

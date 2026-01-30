@@ -8,6 +8,12 @@
 
 @MainActor
 final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
+    
+    private let controller: MTRDeviceController
+
+    init(controller: MTRDeviceController) {
+        self.controller = controller
+    }
     // Firma actualizada
     // Asegúrate de que tu Repositorio o Clase tenga: import Matter
 
@@ -61,8 +67,9 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
    
     
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
-        let controller = await AppContainer.shared.matterController
-        let setupPayload = try MTRSetupPayload(onboardingPayload: qrString)
+        let controller = AppContainer.shared.matterController
+        let setupPayload = MTRSetupPayload(payload: qrString)
+        
         let nodeID = NSNumber(value: UInt64(Date().timeIntervalSince1970))
         
         print("Iniciando sesión de comisionamiento para el Nodo: \(nodeID)")
@@ -70,7 +77,7 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
         // 1. Llamada corregida según la firma de tu SDK (sin await y sin parámetros extra)
         // Nota: Aunque la función es 'throws', al estar en un entorno async,
         // Swift permite usar 'try' directamente.
-        try controller.setupCommissioningSession(with: setupPayload, newNodeID: nodeID)
+        try controller.setupCommissioningSession(with: setupPayload!, newNodeID: nodeID)
 
         let myID = MatterDeviceID(rawValue: nodeID.uint64Value)
 
@@ -79,18 +86,15 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
             name: "SiLabs Light",
             isOnline: false
         )
+        
+        
     }
     
    
-    private let controller: MTRDeviceController
 
-    init(controller: MTRDeviceController) {
-        self.controller = controller
-    }
     
    
-  
-    
+   
 
     // FEATURE: Control de LED (OnOff)
     func toggleLed(for deviceID: MatterDeviceID, to state: LedState) async throws {
@@ -151,3 +155,4 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
         return Int(truncating: mode) == 4 ? .on : .off
     }
 }
+

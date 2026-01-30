@@ -75,10 +75,20 @@ enum MatterControllerFactory {
             return try factory.createController(onNewFabric: params)
             
         } catch {
-            print("error: \(error.localizedDescription)")
-            fatalError("Error crítico: \(error.localizedDescription)")
+            print("Crash detectado: \(error)")
+                // Si falla por corrupción, limpia y reintenta (o pide reinicio)
+                    resetMatterStorage()
+                    fatalError("El almacenamiento estaba corrupto y ha sido limpiado. Ejecuta la app de nuevo.")
         }
     }
+}
+
+func resetMatterStorage() {
+    // Si usas UserDefaults como backend de tu MatterStorage:
+    let domain = Bundle.main.bundleIdentifier!
+    UserDefaults.standard.removePersistentDomain(forName: domain)
+    UserDefaults.standard.synchronize()
+    print("Almacenamiento de Matter limpiado.")
 }
 
 
