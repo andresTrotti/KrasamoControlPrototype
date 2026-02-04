@@ -2,10 +2,11 @@
 //  DeviceDetailView.swift
 //  ControlPrototype
 //
-//  Created by Andres Trotti on 1/23/26.
+//  Created by Andres Trotti on 2/4/26.
 //
 
 
+// DeviceDetailView.swift
 import SwiftUI
 
 struct DeviceDetailView: View {
@@ -20,7 +21,32 @@ struct DeviceDetailView: View {
         ScrollView {
             VStack(spacing: 24) {
                 headerView
-                featuresGrid // Extraído para facilitar el type-check
+                
+                // Grid de características
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(viewModel.availableFeatures) { feature in
+                        if let state = viewModel.features[feature] {
+                            FeatureCardView(
+                                feature: feature,
+                                state: state,
+                                onToggle: { handleFeatureAction(feature) }
+                            )
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                
+                // Controles adicionales
+                if viewModel.availableFeatures.contains(.brightness) {
+                    brightnessControl
+                }
+                
+                if viewModel.availableFeatures.contains(.speed) {
+                    fanSpeedControl
+                }
+                
+                // Botones de acción
+                actionButtons
             }
             .padding(.vertical)
         }
@@ -30,59 +56,96 @@ struct DeviceDetailView: View {
         .onAppear { viewModel.onAppear() }
         .overlay { loadingOverlay }
     }
-
     
-
-    private var featuresGrid: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
-            ledCard
-            temperatureCard
-            heaterCard
-            coolerCard
-            // Aquí podrás añadir las otras 11+ cards sin saturar el compilador
+    private var headerView: some View {
+        VStack(spacing: 8) {
+            Image(systemName: getDeviceIcon())
+                .font(.system(size: 60))
+                .foregroundColor(viewModel.isConnected ? .blue : .gray)
+                .padding()
+                .background(
+                    Circle()
+                        .fill(viewModel.isConnected ? .blue.opacity(0.1) : .gray.opacity(0.1))
+                )
+            
+            Text(viewModel.isConnected ? "Conectado" : "Desconectado")
+                .font(.subheadline)
+                .foregroundColor(viewModel.isConnected ? .green : .red)
+            
+            if let lastSeen = viewModel.lastSeen, !viewModel.isConnected {
+                Text("Última vez: \(lastSeen, style: .relative)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
+        .frame(maxWidth: .infinity)
+    }
+    
+    private var brightnessControl: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Brillo")
+                .font(.headline)
+            
+            HStack {
+                Image(systemName: "sun.min")
+                Slider(value: Binding(
+                    get: { Double(viewModel.brightness) },
+                    set: { viewModel.setBrightness(Int($0)) }
+                ), in: 0...100)
+                Image(systemName: "sun.max")
+            }
+            
+            Text("\(viewModel.brightness)%")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
         .padding(.horizontal)
     }
-
-    private var ledCard: some View {
-        FeatureCard(
-            title: "LED",
-            value: viewModel.ledState == .on ? "Encendido" : "Apagado",
-            icon: "lightbulb.fill",
-            color: .yellow,
-            isActive: viewModel.ledState == .on,
-            action: { viewModel.toggleLed() }
-        )
+    
+    private var fanSpeedControl: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Velocidad del Ventilador")
+                .font(.headline)
+            
+            Picker("Velocidad", selection: Binding(
+                get: { viewModel.fanSpeed },
+                set: { viewModel.setFanSpeed($0) }
+            )) {
+                Text("Apagado").tag(0)
+                Text("Bajo").tag(1)
+                Text("Medio").tag(2)
+                Text("Alto").tag(3)
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding()
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+        .padding(.horizontal)
     }
-
-    private var temperatureCard: some View {
-        FeatureCard(
-            title: "Temperatura",
-            value: viewModel.temperature?.value.description ?? "N/A°C",
-            icon: "thermometer.medium",
-            color: .orange,
-            action: { Task { await viewModel.refreshAll() } }
-        )
+    
+    private var actionButtons: some View {
+        HStack(spacing: 16) {
+            Button("Actualizar") {
+                Task {
+                    await viewModel.refreshAll()
+                }
+            }
+            .buttonStyle(.bordered)
+            
+            if viewModel.availableFeatures.contains(.light) {
+                Button(viewModel.ledState == .on ? "Apagar Luz" : "Encender Luz") {
+                    viewModel.toggleLed()
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .padding()
     }
-
-    private var heaterCard: some View {
-        FeatureCard(
-            title: "Heater",
-            value: viewModel.heaterState == .on ? "Calentando" : "Inactivo",
-            icon: "flame.fill",
-            color: viewModel.heaterState == .on ? .red : .gray
-        )
-    }
-
-    private var coolerCard: some View {
-        FeatureCard(
-            title: "Cooler",
-            value: viewModel.coolerState == .on ? "Enfriando" : "Inactivo",
-            icon: "snowflake",
-            color: viewModel.coolerState == .on ? .blue : .gray
-        )
-    }
-
+    
     @ViewBuilder
     private var loadingOverlay: some View {
         if viewModel.isLoading {
@@ -92,21 +155,115 @@ struct DeviceDetailView: View {
                 .cornerRadius(10)
         }
     }
-
-    private var headerView: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "bolt.shield.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.blue)
-                .padding()
-                .background(Circle().fill(.blue.opacity(0.1)))
-            
-            Text(viewModel.device.isOnline ? "Conectado vía Matter" : "Sin conexión")
-                .font(.subheadline)
-                .foregroundColor(viewModel.device.isOnline ? .green : .red)
+    
+    private func getDeviceIcon() -> String {
+        let name = viewModel.device.name.lowercased()
+        if name.contains("termo") || name.contains("clima") {
+            return "thermometer"
+        } else if name.contains("luz") || name.contains("light") {
+            return "lightbulb"
+        } else if name.contains("ventilador") || name.contains("fan") {
+            return "wind"
+        } else if name.contains("sensor") {
+            return "sensor"
+        } else {
+            return "bolt.shield.fill"
         }
-        .frame(maxWidth: .infinity)
+    }
+    
+    private func handleFeatureAction(_ feature: DeviceFeature) {
+        switch feature {
+        case .light:
+            viewModel.toggleLed()
+        case .heater:
+            viewModel.toggleHeater()
+        case .cooler:
+            viewModel.toggleCooler()
+        default:
+            break
+        }
     }
 }
 
+struct FeatureCardView: View {
+    let feature: DeviceFeature
+    let state: FeatureState
+    let onToggle: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: feature.icon)
+                    .foregroundColor(.blue)
+                
+                Spacer()
+                
+                if isToggleable(feature) {
+                    Button(action: onToggle) {
+                        Image(systemName: "power.circle")
+                    }
+                }
+            }
+            
+            Text(feature.rawValue)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Text(displayValue)
+                .font(.title3)
+                .fontWeight(.semibold)
+            
+            if let date = state.lastUpdated {
+                Text(date, style: .time)
+                    .font(.caption2)
+                    .foregroundColor(.secondary.opacity(0.7))
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, minHeight: 120, alignment: .topLeading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .cornerRadius(12)
+    }
+    
+    private var displayValue: String {
+        if let boolValue = state.value as? Bool {
+            return boolValue ? "On" : "Off"
+        } else if let intValue = state.value as? Int {
+            return "\(intValue)\(feature.unit)"
+        } else if let doubleValue = state.value as? Double {
+            return String(format: "%.1f%@", doubleValue, feature.unit)
+        } else if let dateValue = state.value as? Date {
+            return dateValue.formatted(date: .omitted, time: .shortened)
+        }
+        return "\(state.value)"
+    }
+    
+    private func isToggleable(_ feature: DeviceFeature) -> Bool {
+        return [.light, .heater, .cooler, .fan].contains(feature)
+    }
+}
 
+// MARK: - Preview
+struct DeviceDetailView_Previews: PreviewProvider {
+    @MainActor
+    static var previews: some View {
+        NavigationStack {
+            DeviceDetailView(
+                viewModel: {
+                    let mockDevice = MatterDevice(
+                        deviceID: MatterDeviceID(rawValue: 0x1234),
+                        name: "Living Room Thermostat",
+                        isOnline: true
+                    )
+                    let mockRepository = MockMatterDeviceRepository()
+                    return DeviceDetailViewModel(
+                        device: mockDevice,
+                        toggleLedUseCase: ToggleLedUseCase(repository: mockRepository),
+                        readTemperatureUseCase: ReadTemperatureUseCase(repository: mockRepository)
+                    )
+                }()
+            )
+        }
+        .previewDisplayName("Thermostat")
+    }
+}

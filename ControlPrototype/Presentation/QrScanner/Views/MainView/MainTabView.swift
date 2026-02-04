@@ -8,9 +8,10 @@
 
 // Presentation/MainApp/MainTabView.swift
 import SwiftUI
-
 struct MainTabView: View {
     @EnvironmentObject var container: AppContainer
+    @State private var showingQRScanner = false
+    @State private var selectedDevice: MatterDevice?
     
     var body: some View {
         TabView {
@@ -26,20 +27,32 @@ struct MainTabView: View {
             }
             
             // Tab 2: Devices
-            DeviceListView(
-                viewModel: container.makeDeviceListViewModel(),
-                onSelectDevice: { device in
-                    // Handle device selection - could use navigation or sheet
-                    print("Selected: \(device.name)")
-                },
-                onAddDevice: {
-                    // Handle add device
-                    print("Add device")
-                }
-            )
+            NavigationStack {
+                DeviceListView(
+                    viewModel: container.makeDeviceListViewModel(),
+                    onSelectDevice: { device in
+                        selectedDevice = device
+                    },
+                    onAddDevice: {
+                        showingQRScanner = true
+                    }
+                )
+            }
             .tabItem {
                 Image(systemName: "square.grid.2x2.fill")
                 Text("Devices")
+            }
+            .sheet(isPresented: $showingQRScanner) {
+                // Vista del escáner QR
+                QRScannerView(
+                    viewModel: container.makeQRScannerViewModel()
+                )
+            }
+            .sheet(item: $selectedDevice) { device in
+                // Vista de detalles del dispositivo
+                DeviceDetailView(
+                    viewModel: container.makeDeviceDetailViewModel(device: device)
+                )
             }
             
             // Tab 3: Settings
@@ -83,5 +96,6 @@ struct MainTabView_Previews: PreviewProvider {
             .environmentObject(AppContainer.shared)
     }
 }
+
 
 

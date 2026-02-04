@@ -44,9 +44,15 @@ final class AppContainer: NSObject, ObservableObject {
     // --- Creadores de ViewModels (Para el Router) ---
 
     func makeDeviceListViewModel() -> DeviceListViewModel {
-        // Aquí es donde nace el 'getKnownDevicesUseCase'
         let useCase = GetKnownDevicesUseCaseImpl(repository: deviceRepository)
-        return DeviceListViewModel(getKnownDevicesUseCase: useCase)
+        let viewModel = DeviceListViewModel(getKnownDevicesUseCase: useCase)
+        
+        // Precargar datos si está vacío
+        if viewModel.devices.isEmpty {
+            viewModel.loadMockDevices() // Añade este método al ViewModel
+        }
+        
+        return viewModel
     }
 
     func makeDeviceDetailViewModel(device: MatterDevice) -> DeviceDetailViewModel {
@@ -61,7 +67,10 @@ final class AppContainer: NSObject, ObservableObject {
         let useCase = CommissionDeviceUseCase(repository: deviceRepository)
         return QRScannerViewModel(commissionDeviceUseCase: useCase)
     }
+    
+   
 }
+
 
 
 // MARK: - MTRDeviceControllerDelegate
