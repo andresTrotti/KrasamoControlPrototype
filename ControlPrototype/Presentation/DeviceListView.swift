@@ -6,6 +6,7 @@
 //
 
 
+// Presentation/DeviceList/DeviceListView.swift
 import SwiftUI
 
 struct DeviceListView: View {
@@ -13,8 +14,6 @@ struct DeviceListView: View {
     let onSelectDevice: (MatterDevice) -> Void
     let onAddDevice: () -> Void
     
-    
-
     var body: some View {
         NavigationStack {
             List(viewModel.devices) { device in
@@ -44,6 +43,8 @@ struct DeviceListView: View {
         }
     }
 }
+
+
 
 
 

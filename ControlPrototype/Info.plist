@@ -13,5 +13,13 @@
 		<string>_matterd._udp</string>
 		<string>_myservice._tcp</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>processing</string>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
+		<string>fetch</string>
+		<string>nearby-interaction</string>
+	</array>
 </dict>
 </plist>

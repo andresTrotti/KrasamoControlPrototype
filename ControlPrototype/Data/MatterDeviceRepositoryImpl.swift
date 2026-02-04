@@ -65,8 +65,35 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
     }
     
    
-    
     func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
+        let controller = AppContainer.shared.matterController
+        
+        guard let setupPayload = MTRSetupPayload(payload: qrString) else {
+            throw NSError(domain: "Matter", code: -1, userInfo: [NSLocalizedDescriptionKey: "QR Inválido"])
+        }
+        
+        let nodeID = NSNumber(value: UInt64(Date().timeIntervalSince1970))
+        print("🚀 Iniciando comisionamiento para el Nodo: \(nodeID)")
+
+        // --- CAMBIO CLAVE ---
+        // Usamos el Worker para manejar la espera del Bluetooth
+        let worker = CommissioningWorker(
+            controller: controller,
+            nodeID: nodeID,
+            ssid: "catlleya12", // <--- Poner datos reales
+            pass: "12345678"   // <--- Poner datos reales
+        )
+        
+        // Esta línea se quedará "pausada" (await) hasta que el Bluetooth conecte
+        // y se envíe el Wi-Fi. ¡Adiós al "Incorrect State"!
+        try await worker.start(payload: setupPayload)
+        // -------------------
+
+        let myID = MatterDeviceID(rawValue: nodeID.uint64Value)
+        return MatterDevice(deviceID: myID, name: "SiLabs Light", isOnline: false)
+    }
+    
+    /*func commissionDevice(fromQRCode qrString: String) async throws -> MatterDevice {
         let controller = AppContainer.shared.matterController
         let setupPayload = MTRSetupPayload(payload: qrString)
         
@@ -88,7 +115,7 @@ final class MatterDeviceRepositoryImpl: MatterDeviceRepository, Sendable {
         )
         
         
-    }
+    }*/
     
    
 
