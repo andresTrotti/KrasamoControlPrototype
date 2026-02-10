@@ -27,9 +27,6 @@ class MTRKeypairImpl: NSObject, MTRKeypair {
         super.init()
     }
 
-    // CORRECCIÓN DEFINITIVA:
-    // 1. Es una 'func' (no var) para cumplir con el protocolo.
-    // 2. Tiene '@objc' para que Matter la encuentre y no crashee.
     @objc func publicKey() -> SecKey {
         return SecKeyCopyPublicKey(key)!
     }
