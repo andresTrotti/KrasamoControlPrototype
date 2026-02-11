@@ -30,11 +30,11 @@ ControlPrototype enables:
 - Commissioning Matter devices over Bluetooth (PASE) and injecting Wi‑Fi credentials (CASE).
 - Displaying a list of commissioned devices (mock data for testing).
 - Controlling LED state (on/off) and reading temperature from compatible devices.
-- Exploring a dashboard with home status (temperature, humidity, air quality, etc.).
+- Exploring a dashboard with home status (temperature, humidity, etc.).
 
 The app is intended as a starting point for developers who want to integrate Matter into their iOS apps using Apple's native Matter.framework.
 
-Mira **Deployment** para conocer como desplegar el proyecto.
+Look at **Deployment** to know how to launch the project 
 
 
 ###🛠 Requirements
@@ -52,6 +52,10 @@ The project follows MVVM (Model‑View‑ViewModel) with additional layers:
 
 text
 UI (SwiftUI) → ViewModels (ObservableObject) → UseCases → Repository → Matter SDK
+
+```Swift 
+UI (SwiftUI) → ViewModels (ObservableObject) → UseCases → Repository → Matter SDK
+```
 SwiftUI Views: DeviceListView, DeviceDetailView, QRScannerView, DashboardView.
 
 ViewModels: Manage state and presentation logic (DeviceListViewModel, DeviceDetailViewModel, QRScannerViewModel).
