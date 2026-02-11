@@ -312,13 +312,13 @@ _Software that were used_
 
 * [Simplicity Studio 6](https://www.silabs.com/software-and-tools/simplicity-studio) - SiWG917 project base
 * [Xcode 16.4](https://developer.apple.com/xcode/) - iOS Development
-* [Visual Studio Code](https://code.visualstudio.com/) - [Code editor]
+* [Visual Studio Code](https://code.visualstudio.com/) - Code editor
 
 
 ## Authors
 
 **Krasamo** - [https://www.krasamo.com/]
-**Andres Trotti** - *Documentación* - [andresTrotti](https://github.com/andresTrotti)
+**Andres Trotti** - *Documentation* - [andresTrotti](https://github.com/andresTrotti)
 
 
 
