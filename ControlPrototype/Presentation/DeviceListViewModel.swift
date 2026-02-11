@@ -52,15 +52,15 @@ final class DeviceListViewModel: ObservableObject {
         devices = [
             MatterDevice(
                 deviceID: MatterDeviceID(rawValue: 0xF001),
-                name: "Termostato Sala",
+                name: "Thermostat",
                 isOnline: true
             ),
             MatterDevice(
                 deviceID: MatterDeviceID(rawValue: 0xF002),
-                name: "Luz Cocina",
+                name: "Light",
                 isOnline: true
-            ),
-            MatterDevice(
+            )
+            /*MatterDevice(
                 deviceID: MatterDeviceID(rawValue: 0xF003),
                 name: "Ventilador Dormitorio",
                 isOnline: false
@@ -74,12 +74,8 @@ final class DeviceListViewModel: ObservableObject {
                 deviceID: MatterDeviceID(rawValue: 0xF005),
                 name: "Enchufe Inteligente",
                 isOnline: true
-            ),
-            MatterDevice(
-                deviceID: MatterDeviceID(rawValue: 0xF006),
-                name: "Cámara Seguridad",
-                isOnline: false
-            )
+            ),*/
+        
         ]
     }
     

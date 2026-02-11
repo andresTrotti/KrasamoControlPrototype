@@ -18,8 +18,8 @@ struct DashboardView: View {
                                       
                                       Spacer()
                                       
-                                      // Kit label
-                                      Text("Kit")
+                                     
+                                      Text("More")
                                           .font(.system(size: 14, weight: .medium))
                                           .foregroundColor(.white)
                                           .padding(.horizontal, 12)
@@ -30,7 +30,7 @@ struct DashboardView: View {
                                           )
                                   }
                                   
-                                  Text("Lower the temperature\nto decrease your emissions.")
+                                  Text("Keep in mind that you can help the planet.")
                                       .font(.system(size: 16))
                                       .foregroundColor(.secondary)
                                       .multilineTextAlignment(.leading)
@@ -115,8 +115,8 @@ struct DashboardView: View {
                         
                         // Air Quality Card
                         StatCard(
-                            value: "A",
-                            title: "Air Quality",
+                            value: "Test",
+                            title: "Demo",
                             icon: "wind",
                             color: .green,
                             isActive: true
@@ -125,7 +125,7 @@ struct DashboardView: View {
                         // Energy Usage Card
                         StatCard(
                             value: "42 kWh",
-                            title: "Energy",
+                            title: "Lights",
                             icon: "bolt.fill",
                             color: .orange,
                             isActive: false
@@ -133,8 +133,8 @@ struct DashboardView: View {
                         
                         // CO2 Emissions Card
                         StatCard(
-                            value: "1.2 t",
-                            title: "CO₂ Saved",
+                            value: "1.2",
+                            title: "Demo",
                             icon: "leaf.fill",
                             color: .green,
                             isActive: true
@@ -315,7 +315,7 @@ struct CompactLivingRoomView: View {
                 
                 Spacer()
                 
-                Text("Kit")
+                Text("kit")
                     .font(.caption)
                     .fontWeight(.medium)
                     .foregroundColor(.white)

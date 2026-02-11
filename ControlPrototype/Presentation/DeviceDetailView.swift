@@ -68,12 +68,12 @@ struct DeviceDetailView: View {
                         .fill(viewModel.isConnected ? .blue.opacity(0.1) : .gray.opacity(0.1))
                 )
             
-            Text(viewModel.isConnected ? "Conectado" : "Desconectado")
+            Text(viewModel.isConnected ? "Connected" : "Disconnected")
                 .font(.subheadline)
                 .foregroundColor(viewModel.isConnected ? .green : .red)
             
             if let lastSeen = viewModel.lastSeen, !viewModel.isConnected {
-                Text("Última vez: \(lastSeen, style: .relative)")
+                Text("Last time: \(lastSeen, style: .relative)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -129,7 +129,7 @@ struct DeviceDetailView: View {
     
     private var actionButtons: some View {
         HStack(spacing: 16) {
-            Button("Actualizar") {
+            Button("Refresh") {
                 Task {
                     await viewModel.refreshAll()
                 }
@@ -137,11 +137,12 @@ struct DeviceDetailView: View {
             .buttonStyle(.bordered)
             
             if viewModel.availableFeatures.contains(.light) {
-                Button(viewModel.ledState == .on ? "Apagar Luz" : "Encender Luz") {
+                Button(viewModel.ledState == .on ? "Turn off" : "Turn on") {
                     viewModel.toggleLed()
                 }
                 .buttonStyle(.borderedProminent)
             }
+            
         }
         .padding()
     }
@@ -158,7 +159,7 @@ struct DeviceDetailView: View {
     
     private func getDeviceIcon() -> String {
         let name = viewModel.device.name.lowercased()
-        if name.contains("termo") || name.contains("clima") {
+        if name.contains("termorsta") || name.contains("clima") {
             return "thermometer"
         } else if name.contains("luz") || name.contains("light") {
             return "lightbulb"
