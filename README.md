@@ -37,7 +37,7 @@ The app is intended as a starting point for developers who want to integrate Mat
 Look at **Deployment** to know how to launch the project 
 
 
-###🛠 Requirements
+### Requirements
 
 - Xcode 15.0+ (tested with Xcode 16.4+)
 - iOS 15.0+ (Matter requires iOS 15.0 or later)
@@ -47,61 +47,113 @@ Look at **Deployment** to know how to launch the project
 - Matter‑capable chip (e.g. SiWG917, ESP32‑Matter, etc.)
 
 
-### 🏗 Architecture
+### Architecture
 The project follows MVVM (Model‑View‑ViewModel) with additional layers:
-
-text
-UI (SwiftUI) → ViewModels (ObservableObject) → UseCases → Repository → Matter SDK
 
 ```Swift 
 UI (SwiftUI) → ViewModels (ObservableObject) → UseCases → Repository → Matter SDK
-```
+
 SwiftUI Views: DeviceListView, DeviceDetailView, QRScannerView, DashboardView.
-
-ViewModels: Manage state and presentation logic (DeviceListViewModel, DeviceDetailViewModel, QRScannerViewModel).
-
-Use Cases: Encapsulate business logic (CommissionDeviceUseCase, ToggleLedUseCase, ReadTemperatureUseCase).
-
-Repositories: Abstract the Matter SDK (MatterDeviceRepository, MatterDeviceRepositoryImpl).
-
-Dependency Injection: AppContainer acts as the main assembler and lifecycle manager for the MTRDeviceController.
-
-All Matter interactions are performed asynchronously using async/await and CheckedContinuation to wrap delegate‑based APIs.
+```
 
 
-graph TD
-    subgraph "Presentation (UI)"
-    V[Views] --> VM[ViewModels]
-    end
+#### ViewModels: 
+Manage state and presentation logic (DeviceListViewModel, DeviceDetailViewModel, QRScannerViewModel).
 
-    subgraph "Domain (Business)"
-    VM --> UC[Use Cases]
-    UC --> E[Entities]
-    end
+#### Use Cases: 
+Encapsulate business logic (CommissionDeviceUseCase, ToggleLedUseCase, ReadTemperatureUseCase).
 
-    subgraph "Data & Infra"
-    UC --> R[Repositories]
-    R --> SDK[Matter SDK / SiLabs]
-    end
+#### Repositories: 
+Abstract the Matter SDK (MatterDeviceRepository, MatterDeviceRepositoryImpl).
 
-    style E fill:#f9f,stroke:#333,stroke-width:2px
-    style UC fill:#bbf,stroke:#333,stroke-width:2px
+#### Dependency Injection:
+AppContainer acts as the main assembler and lifecycle manager for the MTRDeviceController.
+
+_All Matter interactions are performed asynchronously using async/await and CheckedContinuation to wrap delegate‑based APIs._
 
 
-### ⚙️ Initial Setup
+### Project Structure
+
+ControlPrototype/
+├── App/
+│   ├── ControlPrototypeApp.swift          # SwiftUI App entry point
+│   ├── AppContainer.swift                # Dependency container & Matter controller
+│   └── AppRouter.swift                  # Legacy routing (replaced by MainTabView)
+│
+├── Domain/
+│   ├── Entities/                         # Business models
+│   │   ├── MatterDevice.swift
+│   │   ├── LedState.swift
+│   │   ├── HeaterState.swift
+│   │   ├── CoolerState.swift
+│   │   └── TemperatureReading.swift
+│   │
+│   └── UseCases/                        # Use cases
+│       ├── CommissionDeviceUseCase.swift
+│       ├── GetKnownDevicesUseCase.swift
+│       ├── ToggleLedUseCase.swift
+│       └── ReadTemperatureUseCase.swift
+│
+├── Data/
+│   ├── Protocols/
+│   │   └── MatterDeviceRepository.swift  # Repository abstraction
+│   │
+│   └── Repositories/
+│       └── MatterDeviceRepositoryImpl.swift # Matter SDK implementation
+│
+├── Presentation/
+│   ├── ViewModels/
+│   │   ├── DeviceListViewModel.swift
+│   │   ├── DeviceDetailViewModel.swift
+│   │   └── QRScannerViewModel.swift
+│   │
+│   └── Views/
+│       ├── DeviceListView.swift
+│       ├── DeviceDetailView.swift
+│       ├── FeatureCard.swift
+│       ├── QRScannerView.swift
+│       ├── QRScannerRepresentable.swift # UIKit bridge for VisionKit
+│       ├── MainTabView.swift           # Main TabView navigation
+│       ├── DashboardView.swift        # Home dashboard
+│       └── HomeDashboardView.swift    # Dashboard extension
+│
+├── Infrastructure/
+│   ├── Matter/
+│   │   ├── MatterControllerFactory.swift # Matter controller factory
+│   │   ├── MatterKeypair.swift           # MTRKeypair implementation
+│   │   ├── MatterStorage.swift           # Persistent storage (UserDefaults)
+│   │   ├── CommissioningWorker.swift     # Step‑by‑step commissioning helper
+│   │   └── MatterError.swift            # Custom errors
+│   │
+│   └── Utils/
+│       └── (extensions, helpers)
+│
+├── Resources/
+│   ├── Assets.xcassets/
+│   ├── Info.plist                       # Permissions (Bluetooth, Bonjour, Background modes)
+│   └── ...
+│
+└── Tests/                               # (Not yet implemented)
+    ├── UnitTests/
+    └── UITests/
+
+
+### Initial Setup
 1. Clone the repository
-bash
+```bash
 git clone https://github.com/your-username/ControlPrototype.git
 cd ControlPrototype
+```
 2. Open the project
 The project uses no external dependency managers; Apple's Matter.framework is provided by the SDK. Simply open:
 
-bash
+```bash
 open ControlPrototype.xcodeproj
-3. Configure team and bundle identifier
-In Xcode, select your Team under Signing & Capabilities.
+```
 
-Adjust the Bundle Identifier if needed (must be unique).
+3. Configure team and bundle identifier
+
+In Xcode, select your Team under Signing & Capabilities. *Adjust the Bundle Identifier if needed (must be unique).*
 
 4. Connect a physical device
 Matter requires Bluetooth and Wi‑Fi capabilities only available on real devices. Connect your iPhone/iPad and select it as the run destination.
@@ -109,14 +161,15 @@ Matter requires Bluetooth and Wi‑Fi capabilities only available on real device
 5. (Optional) Configure Wi‑Fi credentials
 Currently, the SSID and password are hardcoded in MatterDeviceRepositoryImpl.swift inside the commissionDevice method:
 
-swift
+```swift
 let worker = CommissioningWorker(
     controller: controller,
     nodeID: nodeID,
     ssid: "miwifiname",      // <-- Change to your network
     pass: "12345678"         // <-- Change to your password
 )
-Important: Modify these values to match your 2.4 GHz Wi‑Fi network before building.
+```
+*Important: Modify these values to match your 2.4 GHz Wi‑Fi network before building.*
 
 6. Run the app
 Press Cmd+R and wait for the app to launch on your device.    
