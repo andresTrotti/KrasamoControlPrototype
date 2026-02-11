@@ -315,7 +315,7 @@ _Software that were used_
 * [Visual Studio Code](https://code.visualstudio.com/) - [Code editor]
 
 
-## Autores
+## Authors
 
 **Krasamo** - [https://www.krasamo.com/]
 **Andres Trotti** - *Documentación* - [andresTrotti](https://github.com/andresTrotti)
