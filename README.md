@@ -178,41 +178,34 @@ Press Cmd+R and wait for the app to launch on your device.
 
 
 
-### 🚀 Implemented Features
-✅ QR Code Scanning & Commissioning
-Uses DataScannerViewController (VisionKit) to read Matter QR codes.
+### Implemented Features
+QR Code Scanning & Commissioning
+  Uses DataScannerViewController (VisionKit) to read Matter QR codes.
+  Commissioning process managed by CommissioningWorker.
+  Automatically sends Wi‑Fi credentials after Bluetooth connection is established.
+<img width="522" height="989" alt="Screenshot 2026-02-11 at 10 03 38 AM" src="https://github.com/user-attachments/assets/ed95c2f4-942c-407c-8052-fdc8a048249d" />
 
-Commissioning process managed by CommissioningWorker.
+  
 
-Automatically sends Wi‑Fi credentials after Bluetooth connection is established.
+Device List
+  Searchable list with pull‑to‑refresh.
+  Mock data for testing (6 predefined devices).
+  Filtering by name and online/offline status.
 
-✅ Device List
-Searchable list with pull‑to‑refresh.
+Device Detail
+  Displays features according to device type (thermostat, light, fan, sensor).
+  LED On/Off control via Matter OnOff cluster.
+  Temperature reading (Matter Temperature Measurement cluster).
 
-Mock data for testing (6 predefined devices).
+Dashboard
+  Main view with a simulated thermostat, statistics cards, and quick actions.
+  Fully integrated with MainTabView navigation.
 
-Filtering by name and online/offline status.
-
-✅ Device Detail
-Displays features according to device type (thermostat, light, fan, sensor).
-
-LED On/Off control via Matter OnOff cluster.
-
-Temperature reading (Matter Temperature Measurement cluster).
-
-Mock indicators for connectivity, battery, power consumption, etc.
-
-✅ Dashboard
-Main view with a simulated thermostat, statistics cards, and quick actions.
-
-Fully integrated with MainTabView navigation.
-
-✅ Tab Navigation
-Home: Dashboard.
-
-Devices: Device list.
-
-Settings: Basic settings.
+Tab Navigation
+  Home: Dashboard.
+  
+  Devices: Device list.
+  Settings: Basic settings.
 
 
 
