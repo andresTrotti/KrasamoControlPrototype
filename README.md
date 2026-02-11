@@ -1,8 +1,9 @@
 # SiLabs, Matter and iOS Integration Demo 
 
 
-https://github.com/user-attachments/assets/7cd39550-52e0-4574-b9b2-2e87d6d3f7f4
 
+
+![Demo view](https://github.com/user-attachments/assets/594cf21b-9cab-413a-914b-67ca3acd1ff3)
 
 
 
