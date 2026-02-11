@@ -2,9 +2,40 @@
 
 _This demo is an iOS application that integrates Apple's Matter.framework to commission, control, and monitor Matter‑certified devices. It is specifically designed to work with the Silicon Labs SiWG917 development kit. The project follows a clean MVVM architecture with dependency injection, use cases, and repositories, all built with SwiftUI._
 
-## Comenzando 🚀
+## 📋 Table of Contents
 
-_Estas instrucciones te permitirán obtener una copia del proyecto en funcionamiento en tu máquina local para propósitos de desarrollo y pruebas._
+- [Overview](#overview)
+- [Requirements](#requirements)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [Initial Setup](#initial-setup)
+- [Implemented Features](#implemented-features)
+- [Commissioning Flow](#commissioning-flow)
+- [Key Components](#key-components)
+  - [AppContainer](#appcontainer)
+  - [MatterControllerFactory](#mattercontrollerfactory)
+  - [MatterKeypair](#matterkeypair)
+  - [CommissioningWorker](#commissioningworker)
+- [Repositories & Use Cases](#repositories--use-cases)
+- [ViewModels & Views](#viewmodels--views)
+- [Known Issues & Solutions](#known-issues--solutions)
+- [Future Improvements](#future-improvements)
+- [License](#license)
+
+## Overview
+ControlPrototype enables:
+
+Scanning Matter QR codes to start commissioning.
+
+Commissioning Matter devices over Bluetooth (PASE) and injecting Wi‑Fi credentials (CASE).
+
+Displaying a list of commissioned devices (mock data for testing).
+
+Controlling LED state (on/off) and reading temperature from compatible devices.
+
+Exploring a dashboard with home status (temperature, humidity, air quality, etc.).
+
+The app is intended as a starting point for developers who want to integrate Matter into their iOS apps using Apple's native Matter.framework.
 
 Mira **Deployment** para conocer como desplegar el proyecto.
 
