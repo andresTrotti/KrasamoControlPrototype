@@ -40,9 +40,13 @@ The app is intended as a starting point for developers who want to integrate Mat
 Mira **Deployment** para conocer como desplegar el proyecto.
 
 
-### Pre-requisitos 📋
-
-_Que cosas necesitas para instalar el software y como instalarlas_
+###🛠 Requirements
+- Xcode 15.0+ (tested with Xcode 16.4+)
+- iOS 15.0+ (Matter requires iOS 15.0 or later)
+- Physical device (iPhone/iPad) – Matter does not run on the simulator
+- Apple Developer account (to run on device)
+- Wi‑Fi network (2.4 GHz recommended for Matter devices)
+- Matter‑capable chip (e.g. SiWG917, ESP32‑Matter, etc.)
 
 ```
 Da un ejemplo
