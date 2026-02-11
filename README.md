@@ -236,7 +236,7 @@ try await worker.start(payload: payload)
 
 ### Key Components
 
-#### 1. AppContainer
+#### AppContainer
 A @MainActor singleton that:
 
  - Holds the single MTRDeviceController instance.
@@ -247,7 +247,7 @@ A @MainActor singleton that:
 #### Why NSObject and @MainActor?
 Matter's delegate protocol requires NSObjectProtocol conformance; as a singleton that updates the UI, it is forced to run on the main thread.
 
-#### 2. MatterControllerFactory
+#### MatterControllerFactory
 
 Builds the Matter controller with the minimum required parameters:
 - MTRStorage: MatterStorage (UserDefaults with "matter." prefix).
@@ -257,13 +257,13 @@ Builds the Matter controller with the minimum required parameters:
 - Vendor ID: 0xFFF1 (test range).
 - Handles storage corruption errors and resets UserDefaults when needed.
 
-#### 3. MatterKeypair
+#### MatterKeypair
 Implementation of MTRKeypair using Security.framework (SecKeyCreateRandomKey, SecKeyCreateSignature). Generates ephemeral key pairs (non‑persistent) and signs messages with ECDSA SHA256.
 
-#### 4. CommissioningWorker
+#### CommissioningWorker
 A helper NSObject that implements MTRDeviceControllerDelegate and uses a CheckedContinuation to convert the delegate‑based asynchronous process into an async throws function. It retains itself until the work is complete.
 
-#### 5. Repositories & Use Cases
+#### Repositories & Use Cases
 
 - MatterDeviceRepository: Defines contracts for commissioning, listing, reading attributes, and sending commands.
 - MatterDeviceRepositoryImpl: Concrete implementation that uses MTRDevice and its clusters.
@@ -272,7 +272,7 @@ A helper NSObject that implements MTRDeviceControllerDelegate and uses a Checked
 - commissionDevice: Invokes CommissioningWorker.
 - Use Cases: Simple wrappers that inject the repository and expose an execute method.
 
-#### 6. ViewModels & SwiftUI Views
+#### ViewModels & SwiftUI Views
  
  - DeviceListViewModel: Manages the device list (mock) and asynchronous loading.
  - DeviceDetailViewModel: Logic for the detail screen; exposes @Published properties for temperature, LED state, etc. Uses the injected use cases.
