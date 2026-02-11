@@ -1,5 +1,6 @@
 # SiLabs, Matter and iOS Integration Demo 
-<img width="2560" height="1325" alt="Screenshot 2026-02-11 at 9 23 48 AM" src="https://github.com/user-attachments/assets/be2f79b1-0ed4-4f4c-a198-081a815afb7f" />
+<img width="2557" height="1303" alt="Screenshot 2026-02-11 at 10 27 53 AM" src="https://github.com/user-attachments/assets/5a5eb591-08b5-415c-b72f-207defdcfd84" />
+
 
 _This demo is an iOS application that integrates Apple's Matter.framework to commission, control, and monitor Matter‑certified devices. It is specifically designed to work with the Silicon Labs SiWG917 development kit. The project follows a clean MVVM architecture with dependency injection, use cases, and repositories, all built with SwiftUI._
 
