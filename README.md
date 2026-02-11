@@ -26,15 +26,11 @@ _This demo is an iOS application that integrates Apple's Matter.framework to com
 ## Overview
 ControlPrototype enables:
 
-Scanning Matter QR codes to start commissioning.
-
-Commissioning Matter devices over Bluetooth (PASE) and injecting Wi‑Fi credentials (CASE).
-
-Displaying a list of commissioned devices (mock data for testing).
-
-Controlling LED state (on/off) and reading temperature from compatible devices.
-
-Exploring a dashboard with home status (temperature, humidity, air quality, etc.).
+- Scanning Matter QR codes to start commissioning.
+- Commissioning Matter devices over Bluetooth (PASE) and injecting Wi‑Fi credentials (CASE).
+- Displaying a list of commissioned devices (mock data for testing).
+- Controlling LED state (on/off) and reading temperature from compatible devices.
+- Exploring a dashboard with home status (temperature, humidity, air quality, etc.).
 
 The app is intended as a starting point for developers who want to integrate Matter into their iOS apps using Apple's native Matter.framework.
 
@@ -42,14 +38,13 @@ Mira **Deployment** para conocer como desplegar el proyecto.
 
 
 ###🛠 Requirements
+
 - Xcode 15.0+ (tested with Xcode 16.4+)
 - iOS 15.0+ (Matter requires iOS 15.0 or later)
 - Physical device (iPhone/iPad) – Matter does not run on the simulator
 - Apple Developer account (to run on device)
 - Wi‑Fi network (2.4 GHz recommended for Matter devices)
 - Matter‑capable chip (e.g. SiWG917, ESP32‑Matter, etc.)
-
-
 
 
 ### 🏗 Architecture
@@ -70,69 +65,23 @@ Dependency Injection: AppContainer acts as the main assembler and lifecycle mana
 All Matter interactions are performed asynchronously using async/await and CheckedContinuation to wrap delegate‑based APIs.
 
 
-ControlPrototype/
-├── App/
-│   ├── ControlPrototypeApp.swift          # SwiftUI App entry point
-│   ├── AppContainer.swift                # Dependency container & Matter controller
-│   └── AppRouter.swift                  # Legacy routing (replaced by MainTabView)
-│
-├── Domain/
-│   ├── Entities/                         # Business models
-│   │   ├── MatterDevice.swift
-│   │   ├── LedState.swift
-│   │   ├── HeaterState.swift
-│   │   ├── CoolerState.swift
-│   │   └── TemperatureReading.swift
-│   │
-│   └── UseCases/                        # Use cases
-│       ├── CommissionDeviceUseCase.swift
-│       ├── GetKnownDevicesUseCase.swift
-│       ├── ToggleLedUseCase.swift
-│       └── ReadTemperatureUseCase.swift
-│
-├── Data/
-│   ├── Protocols/
-│   │   └── MatterDeviceRepository.swift  # Repository abstraction
-│   │
-│   └── Repositories/
-│       └── MatterDeviceRepositoryImpl.swift # Matter SDK implementation
-│
-├── Presentation/
-│   ├── ViewModels/
-│   │   ├── DeviceListViewModel.swift
-│   │   ├── DeviceDetailViewModel.swift
-│   │   └── QRScannerViewModel.swift
-│   │
-│   └── Views/
-│       ├── DeviceListView.swift
-│       ├── DeviceDetailView.swift
-│       ├── FeatureCard.swift
-│       ├── QRScannerView.swift
-│       ├── QRScannerRepresentable.swift # UIKit bridge for VisionKit
-│       ├── MainTabView.swift           # Main TabView navigation
-│       ├── DashboardView.swift        # Home dashboard
-│       └── HomeDashboardView.swift    # Dashboard extension
-│
-├── Infrastructure/
-│   ├── Matter/
-│   │   ├── MatterControllerFactory.swift # Matter controller factory
-│   │   ├── MatterKeypair.swift           # MTRKeypair implementation
-│   │   ├── MatterStorage.swift           # Persistent storage (UserDefaults)
-│   │   ├── CommissioningWorker.swift     # Step‑by‑step commissioning helper
-│   │   └── MatterError.swift            # Custom errors
-│   │
-│   └── Utils/
-│       └── (extensions, helpers)
-│
-├── Resources/
-│   ├── Assets.xcassets/
-│   ├── Info.plist                       # Permissions (Bluetooth, Bonjour, Background modes)
-│   └── ...
-│
-└── Tests/                               # (Not yet implemented)
-    ├── UnitTests/
-    └── UITests/
+graph TD
+    subgraph "Presentation (UI)"
+    V[Views] --> VM[ViewModels]
+    end
 
+    subgraph "Domain (Business)"
+    VM --> UC[Use Cases]
+    UC --> E[Entities]
+    end
+
+    subgraph "Data & Infra"
+    UC --> R[Repositories]
+    R --> SDK[Matter SDK / SiLabs]
+    end
+
+    style E fill:#f9f,stroke:#333,stroke-width:2px
+    style UC fill:#bbf,stroke:#333,stroke-width:2px
 
 
 ### ⚙️ Initial Setup
