@@ -5,7 +5,6 @@
 //  Created by Andres Trotti on 1/23/26.
 //
 
-// DeviceDetailViewModel.swift
 import Foundation
 
 // MARK: - Enums y Structs auxiliares (fuera de @MainActor)
