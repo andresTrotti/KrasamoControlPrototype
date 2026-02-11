@@ -37,6 +37,7 @@ The app is intended as a starting point for developers who want to integrate Mat
 Look at **Deployment** to know how to launch the project 
 
 
+
 ### Requirements
 
 - Xcode 15.0+ (tested with Xcode 16.4+)
@@ -199,7 +200,7 @@ QR Code Scanning & Commissioning
   - LED On/Off control via Matter OnOff cluster.
   - Temperature reading (Matter Temperature Measurement cluster).
     
-<img width="649" height="725" alt="Screenshot 2026-02-11 at 10 19 51 AM" src="https://github.com/user-attachments/assets/e6aa23c7-b178-4b12-bb44-7e865366fb22" />
+<img width="430" height="511" alt="Screenshot 2026-02-11 at 10 26 07 AM" src="https://github.com/user-attachments/assets/b6120445-44c6-4907-9e84-f589c9595c6a" />
 
 #### Dashboard
   - Main view with a simulated thermostat, statistics cards, and quick actions.
