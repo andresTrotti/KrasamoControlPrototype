@@ -187,28 +187,27 @@ QR Code Scanning & Commissioning
 <img width="631" height="483" alt="Screenshot 2026-02-11 at 10 17 49 AM" src="https://github.com/user-attachments/assets/a6a67c8d-f04e-429f-a934-e22a37e08fbb" />
 
 
-Device List
+#### Device List
   - Searchable list with pull‑to‑refresh.
   - Mock data for testing (6 predefined devices).
   - Filtering by name and online/offline status.
     
 <img width="676" height="504" alt="Screenshot 2026-02-11 at 10 18 52 AM" src="https://github.com/user-attachments/assets/891ab132-68ea-4a44-914c-52d63d403ece" />
 
-Device Detail
+#### Device Detail
   - Displays features according to device type (thermostat, light, fan, sensor).
   - LED On/Off control via Matter OnOff cluster.
   - Temperature reading (Matter Temperature Measurement cluster).
     
 <img width="649" height="725" alt="Screenshot 2026-02-11 at 10 19 51 AM" src="https://github.com/user-attachments/assets/e6aa23c7-b178-4b12-bb44-7e865366fb22" />
 
-Dashboard
+#### Dashboard
   - Main view with a simulated thermostat, statistics cards, and quick actions.
   - Fully integrated with MainTabView navigation.
 
-    <img width="433" height="693" alt="Screenshot 2026-02-11 at 10 20 41 AM" src="https://github.com/user-attachments/assets/13d706a8-690c-4915-ab7b-242b5407fa1c" />
+<img width="376" height="680" alt="Screenshot 2026-02-11 at 10 23 47 AM" src="https://github.com/user-attachments/assets/d5f02a94-5fc6-4489-9d67-28419aec7670" />
 
-
-Tab Navigation
+#### Tab Navigation
   - Home: Dashboard.
   - Devices: Device list.
   - Settings: Basic settings.
