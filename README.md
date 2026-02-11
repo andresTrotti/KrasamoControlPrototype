@@ -73,7 +73,7 @@ _All Matter interactions are performed asynchronously using async/await and Chec
 
 
 ### Project Structure
-
+```text
 ControlPrototype/
 ├── App/
 │   ├── ControlPrototypeApp.swift          # SwiftUI App entry point
@@ -136,6 +136,7 @@ ControlPrototype/
 └── Tests/                               # (Not yet implemented)
     ├── UnitTests/
     └── UITests/
+```
 
 
 ### Initial Setup
@@ -153,13 +154,14 @@ open ControlPrototype.xcodeproj
 
 3. Configure team and bundle identifier
 
-In Xcode, select your Team under Signing & Capabilities. *Adjust the Bundle Identifier if needed (must be unique).*
+- In Xcode, select your Team under Signing & Capabilities.
+- *Adjust the Bundle Identifier if needed (must be unique).*
 
 4. Connect a physical device
-Matter requires Bluetooth and Wi‑Fi capabilities only available on real devices. Connect your iPhone/iPad and select it as the run destination.
+- Matter requires Bluetooth and Wi‑Fi capabilities only available on real devices. Connect your iPhone/iPad and select it as the run destination.
 
 5. (Optional) Configure Wi‑Fi credentials
-Currently, the SSID and password are hardcoded in MatterDeviceRepositoryImpl.swift inside the commissionDevice method:
+- Currently, the SSID and password are hardcoded in MatterDeviceRepositoryImpl.swift inside the commissionDevice method:
 
 ```swift
 let worker = CommissioningWorker(
