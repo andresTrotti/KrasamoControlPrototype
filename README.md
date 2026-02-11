@@ -309,38 +309,13 @@ SOFTWARE.
 
 
 
+## Build with
 
-### Instalación 🔧
+_Software that were used_
 
-_Una serie de ejemplos paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose_
-
-_Dí cómo será ese paso_
-
-```
-Da un ejemplo
-```
-
-_Y repite_
-
-```
-hasta finalizar
-```
-
-
-
-
-
-## Despliegue 📦
-
-_Agrega notas adicionales sobre como hacer deploy_
-
-## Construido con 🛠️
-
-_Menciona las herramientas que utilizaste para crear tu proyecto_
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - El framework web usado
-* [Maven](https://maven.apache.org/) - Manejador de dependencias
-* [ROME](https://rometools.github.io/rome/) - Usado para generar RSS
+* [Simplicity Studio 6](https://www.silabs.com/software-and-tools/simplicity-studio) - SiWG917 project base
+* [Xcode 16.4](https://developer.apple.com/xcode/) - iOS Development
+* [Visual Studio Code](https://code.visualstudio.com/) - [Code editor]
 
 
 ## Autores
