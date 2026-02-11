@@ -34,8 +34,8 @@ struct DeviceListView: View {
                     deviceListView
                 }
             }
-            .navigationTitle("Dispositivos")
-            .searchable(text: $searchText, prompt: "Buscar dispositivos")
+            .navigationTitle("Devices")
+            .searchable(text: $searchText, prompt: "Find device")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -84,7 +84,7 @@ struct DeviceListView: View {
                     )
                 }
             } header: {
-                Text("\(filteredDevices.count) dispositivos")
+                Text("\(filteredDevices.count) devices")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -217,7 +217,7 @@ struct MockGetKnownDevicesUseCase: GetKnownDevicesUseCase {
         return [
             MatterDevice(
                 deviceID: MatterDeviceID(rawValue: 0xF001),
-                name: "Termostato Sala",
+                name: "Thermostat",
                 isOnline: true
             ),
             MatterDevice(

@@ -13,6 +13,7 @@ struct MainTabView: View {
     @State private var showingQRScanner = false
     @State private var selectedDevice: MatterDevice?
     
+    //add
     var body: some View {
         TabView {
             // Tab 1: Dashboard
