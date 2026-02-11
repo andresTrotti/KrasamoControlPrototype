@@ -180,9 +180,10 @@ Press Cmd+R and wait for the app to launch on your device.
 
 ### Implemented Features
 QR Code Scanning & Commissioning
-  Uses DataScannerViewController (VisionKit) to read Matter QR codes.
-  Commissioning process managed by CommissioningWorker.
-  Automatically sends Wi‑Fi credentials after Bluetooth connection is established.
+  Uses DataScannerViewController (VisionKit) to read Matter QR codes. \n
+  Commissioning process managed by CommissioningWorker. \n
+  Automatically sends Wi‑Fi credentials after Bluetooth connection is established. \n
+  
 <img width="522" height="989" alt="Screenshot 2026-02-11 at 10 03 38 AM" src="https://github.com/user-attachments/assets/ed95c2f4-942c-407c-8052-fdc8a048249d" />
 
   
