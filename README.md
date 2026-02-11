@@ -19,9 +19,7 @@ _This demo is an iOS application that integrates Apple's Matter.framework to com
   - [MatterKeypair](#matterkeypair)
   - [CommissioningWorker](#commissioningworker)
 - [Repositories & Use Cases](#repositories--use-cases)
-- [ViewModels & Views](#viewmodels--views)
-- [Known Issues & Solutions](#known-issues--solutions)
-- [Future Improvements](#future-improvements)
+
 - [License](#license)
 
 ## Overview
